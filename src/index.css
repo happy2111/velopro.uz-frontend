@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss";
+@tailwind utilities;
+
+
+/** {*/
+/*  margin: 0;*/
+/*  padding: 0;*/
+/*  box-sizing: border-box;*/
+/*}*/
+
+body {
+  background-color: var(--color-dark-06);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Кастомные стили */
+.gradient-text {
+  background: linear-gradient(135deg, #e11d48, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-primary {
+  @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-105;
+}
+
+.btn-secondary {
+  @apply bg-gray-800 hover:bg-gray-700 text-[#f5f5f5] font-semibold py-3 px-6 rounded-2xl shadow-xl border border-gray-700 transition-all duration-300;
+}
+
+.card {
+  @apply bg-gray-900/50 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-800;
+}
+
+
+@theme {
+  --color-red-50: oklch(0.971 0.013 17.38);
+  --color-red-100: oklch(0.936 0.032 17.717);
+  --color-red-200: oklch(0.885 0.062 18.334);
+  --color-red-300: oklch(0.808 0.114 19.571);
+  --color-red-400: oklch(0.704 0.191 22.216);
+  --color-red-500: oklch(0.637 0.237 25.331);
+  --color-red-600: oklch(0.577 0.245 27.325);
+  --color-red-700: oklch(0.505 0.213 27.518);
+  --color-red-800: oklch(0.444 0.177 26.899);
+  --color-red-900: oklch(0.396 0.141 25.723);
+  --color-red-950: oklch(0.258 0.092 26.042);
+
+  --color-dark-06: #0F0F0F;
+  --color-dark-10: #1A1A1A;
+  --color-dark-12: #1F1F1F;
+  --color-dark-15: #262626;
+  --color-dark-20: #333333;
+  --color-dark-25: #404040;
+  --color-dark-30: #4D4D4D;
+  --color-dark-35: #595959;
+
+  --color-gray-40: #676665;
+  --color-gray-50: #81807E;
+  --color-gray-70: #B3B3B2;
+  --color-gray-80: #CACACE;
+  --color-gray-90: #E6E6E6;
+  --color-gray-95: #F2F2F2;
+  --color-gray-97: #F7F7F7;
+  --color-gray-99: #FCFCFC;
+
+  /*--color-brown-60: #B5A38F;*/
+  /*--color-brown-65: #BEAF9C;*/
+  /*--color-brown-70: #C7BAAB;*/
+  /*--color-brown-80: #D9D0C7;*/
+  /*--color-brown-90: #E5E1DC;*/
+  /*--color-brown-95: #EAE9E6;*/
+  /*--color-brown-97: #EEEDEB;*/
+  /*--color-brown-99: #EFEFEE;*/
+
+  --color-brown-60: #D66A5D;
+  --color-brown-65: #DD786B;
+  --color-brown-70: #E38579;
+  --color-brown-80: #EDA097;
+  --color-brown-90: #F4C2BA;
+  --color-brown-95: #F9D7D2;
+  --color-brown-97: #FBE3DF;
+  --color-brown-99: #FDF0EE;
+
+}
+@theme {
+  --font-roboto: "Roboto", sans-serif;
+  --font-roboto-mono: "Roboto Mono", monospace;
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .border-custom {
+    background-image: repeating-linear-gradient(90deg, #404040, #404040 8px, transparent 8px, transparent 22px), repeating-linear-gradient(180deg, #404040, #404040 8px, transparent 8px, transparent 22px), repeating-linear-gradient(90deg, #404040, #404040 8px, transparent 8px, transparent 22px), repeating-linear-gradient(180deg, #404040, #404040 8px, transparent 8px, transparent 22px);
+    background-position: left 21px top, right top 7px, left 21px bottom, left top 7px;
+    background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
+    background-size: calc(100% * 22) 2px, 2px calc(100% * 22), calc(100% * 22) 2px, 2px calc(100% * 22);
+  }
+  .border-b-custom {
+    background-image: repeating-linear-gradient(90deg, #404040, #404040 8px, transparent 8px, transparent 22px);
+    background-position: left 21px bottom;
+    background-repeat: repeat-x;
+    background-size: calc(100% * 22) 2px;
+  }
+  border-t-custom {
+    background-image: repeating-linear-gradient(90deg, #404040, #404040 8px, transparent 8px, transparent 22px);
+    background-position: left 21px top;
+    background-repeat: repeat-x;
+    background-size: calc(100% * 22) 2px;
+  }
+  border-r-custom {
+    background-image: repeating-linear-gradient(180deg, #404040, #404040 8px, transparent 8px, transparent 22px);
+    background-position: right top 7px;
+    background-repeat: repeat-y;
+    background-size: 2px calc(100% * 22);
+  }
+  border-l-custom {
+    background-image: repeating-linear-gradient(180deg, #404040, #404040 8px, transparent 8px, transparent 22px);
+    background-position: left top 7px;
+    background-repeat: repeat-y;
+    background-size: 2px calc(100% * 22);
+  }
+}
