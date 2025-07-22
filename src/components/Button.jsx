@@ -29,7 +29,7 @@ const Button = ({ text, isTransparent, border, icon, className, href, CustomIcon
   );
 
   return href ? (
-    <Link to={href} className={baseClasses}>
+    <Link to={href} className={baseClasses} onClick={onClick}>
       {content}
     </Link>
   ) : (
