@@ -1,4 +1,3 @@
-// 📁 src/pages/Cart.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -22,7 +21,8 @@ const Cart = () => {
       if (user) {
         // Загрузить корзину с сервера
         const response = await axiosInstance.get('/api/cart');
-        setCartItems(response.data.items || []);
+        setCartItems(response.data.products || []);
+        console.log('Cart loaded from server:', response.data.products);
       } else {
         // Загрузить корзину из localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -187,13 +187,13 @@ const Cart = () => {
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map(item => (
-                <div key={item.productId} className="bg-gray-900 rounded-2xl shadow-xl p-6">
+                <div key={item.product._id} className="bg-gray-900 rounded-2xl shadow-xl p-6">
                   <div className="flex items-center space-x-4">
                     {/* Product Image */}
                     <div className="w-20 h-20 bg-gray-800 rounded-xl flex-shrink-0">
-                      {item.product?.image ? (
+                      {item.product?.images.length > 0 ? (
                         <img
-                          src={item.product.image}
+                          src={`${import.meta.env.VITE_API_BASE_URL}${item.product.images[0]}`}
                           alt={item.product.name}
                           className="w-full h-full object-cover rounded-xl"
                         />
@@ -209,7 +209,7 @@ const Cart = () => {
                     {/* Product Info */}
                     <div className="flex-1">
                       <h3 className="text-lg font-bold mb-1">
-                        {item.product?.name || 'Неизвестный товар'}
+                        {item.product?.title || 'Неизвестный товар'}
                       </h3>
                       <p className="text-gray-400 text-sm">
                         {item.product?.price ? `${item.product.price.toLocaleString()} сум` : 'Цена не указана'}
@@ -219,8 +219,8 @@ const Cart = () => {
                     {/* Quantity Controls */}
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                        disabled={updatingItems.has(item.productId)}
+                        onClick={() => updateQuantity(item.product._id, item.quantity - 1)}
+                        disabled={updatingItems.has(item.product._id)}
                         className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center disabled:opacity-50"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,12 +229,12 @@ const Cart = () => {
                       </button>
 
                       <span className="w-8 text-center font-medium">
-                        {updatingItems.has(item.productId) ? '...' : item.quantity}
+                        {updatingItems.has(item.product._id) ? '...' : item.quantity}
                       </span>
 
                       <button
-                        onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                        disabled={updatingItems.has(item.productId)}
+                        onClick={() => updateQuantity(item.product._id, item.quantity + 1)}
+                        disabled={updatingItems.has(item.product._id )}
                         className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center disabled:opacity-50"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,8 +245,8 @@ const Cart = () => {
 
                     {/* Remove Button */}
                     <button
-                      onClick={() => removeItem(item.productId)}
-                      disabled={updatingItems.has(item.productId)}
+                      onClick={() => removeItem(item.product._id)}
+                      disabled={updatingItems.has(item.product._id)}
                       className="text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import axiosInstance from '../utils/axiosInstance';
+import axios from "axios";
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -26,7 +27,7 @@ const Profile = () => {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get('/api/users/me');
+      const response = await axiosInstance.get(`/api/auth/me`);
       setUserData(response.data);
       console.log(response.data);
       setFormData({

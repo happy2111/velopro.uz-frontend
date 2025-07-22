@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
 
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -12,25 +13,36 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [accessToken, setAccessToken] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  const [accessToken, setAccessToken] = useState(() => {
+    const storedToken = localStorage.getItem('accessToken');
+    return storedToken ? JSON.parse(storedToken) : null;
+  });
+
   const [loading, setLoading] = useState(true);
 
-  // Проверяем авторизацию при загрузке приложения
+  // Проверяем авторизацию при первом запуске
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Пытаемся обновить токен через refresh token в cookie
         const response = await axiosInstance.post('/api/auth/refresh');
-        const { accessToken: newToken } = response.data;
-
+        const newToken = response.data.accessToken;
+        localStorage.setItem('accessToken', JSON.stringify(newToken));
         setAccessToken(newToken);
 
-        // Получаем данные пользователя
         const userResponse = await axiosInstance.get('/api/users/me');
         setUser(userResponse.data);
+        localStorage.setItem('user', JSON.stringify(userResponse.data));
       } catch (error) {
         console.log('No valid session found');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        setAccessToken(null);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -47,11 +59,10 @@ export const AuthProvider = ({ children }) => {
       });
 
       const { accessToken: token, user: userData } = response.data;
-
+      localStorage.setItem('accessToken', JSON.stringify(token));
+      localStorage.setItem('user', JSON.stringify(userData));
       setAccessToken(token);
       setUser(userData);
-
-      // Синхронизируем корзину после входа
       await syncCartWithBackend();
 
       return { success: true };
@@ -67,10 +78,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axiosInstance.post('/api/auth/register', userData);
       const { accessToken: token, user: newUser } = response.data;
-
+      localStorage.setItem('accessToken', JSON.stringify(token));
+      localStorage.setItem('user', JSON.stringify(newUser));
       setAccessToken(token);
       setUser(newUser);
-
       return { success: true };
     } catch (error) {
       return {
@@ -86,6 +97,8 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
       setAccessToken(null);
       setUser(null);
     }
@@ -95,14 +108,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
       if (localCart.length > 0) {
-        // Отправляем товары из локальной корзины на сервер
         for (const item of localCart) {
           await axiosInstance.post('/api/cart', {
             productId: item.productId,
             quantity: item.quantity
           });
         }
-        // Очищаем локальную корзину
         localStorage.removeItem('cart');
       }
     } catch (error) {

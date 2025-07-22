@@ -1,6 +1,6 @@
 import arrow from "../assets/icons/arrow.png";
 import { Link } from "react-router-dom";
-const Button = ({ text, isTransparent, border, icon, className, href, CustomIcon, onClick }) => {
+const Button = ({ text, isTransparent, border, icon, className, href, CustomIcon, onClick , type, disabled}) => {
   const baseClasses = `
     ${isTransparent ? 'bg-transparent text-white/50 font-roboto-mono' : 'bg-dark-12 border-none font-roboto-mono text-white'}
     !px-4 h-[49px] rounded-lg text-[16px]
@@ -33,7 +33,7 @@ const Button = ({ text, isTransparent, border, icon, className, href, CustomIcon
       {content}
     </Link>
   ) : (
-    <button className={baseClasses} onClick={onClick}>
+    <button type={type} disabled={disabled} className={baseClasses} onClick={onClick}>
       {content}
     </button>
   );

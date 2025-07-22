@@ -1,6 +1,7 @@
-// 📁 src/pages/Products.jsx
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
+import ProductSwiper from "../components/ProductSwiper.jsx";
+import {Link} from "react-router-dom";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -48,7 +49,7 @@ const Products = () => {
     return (
       <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brown-60 mx-auto mb-4"></div>
           <p className="text-xl">Загрузка товаров...</p>
         </div>
       </div>
@@ -86,14 +87,14 @@ const Products = () => {
                 placeholder="Поиск велосипедов..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-gray-800 text-[#f5f5f5] border border-gray-700 focus:border-red-600 focus:outline-none"
+                className="w-full px-4 py-3 rounded-2xl bg-dark-10 text-[#f5f5f5] border border-gray-40 focus:border-brown-60 focus:outline-none"
               />
             </div>
             <div>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 rounded-2xl bg-gray-800 text-[#f5f5f5] border border-gray-700 focus:border-red-600 focus:outline-none"
+                className="px-4 py-3 rounded-2xl bg-dark-10 text-[#f5f5f5] border border-gray-40 focus:border-brown-60 focus:outline-none"
               >
                 <option value="name">По названию</option>
                 <option value="price_low">Цена: по возрастанию</option>
@@ -111,17 +112,15 @@ const Products = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map(product => (
-              <div key={product._id} className="bg-gray-900 rounded-2xl shadow-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300">
-                <div className="aspect-square bg-gray-800">
-                  {product.image ? (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
+              <div key={product._id} className="bg-dark-12 rounded-2xl shadow-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300">
+                <div className="aspect-square bg-dark-12 productSwiper">
+                  {product.images.length > 0 ? (
+                    <ProductSwiper
+                      images={product.images}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <svg className="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-16 h-16 text-dark-25" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2L3 7l9 5 9-5-9-5zM3 17l9 5 9-5M3 12l9 5 9-5"/>
                       </svg>
                     </div>
@@ -129,19 +128,19 @@ const Products = () => {
                 </div>
 
                 <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2 line-clamp-2">{product.name}</h3>
-                  <p className="text-gray-400 mb-4 line-clamp-3">{product.description}</p>
-
+                  <h3 className="text-xl font-bold mb-2 line-clamp-2">{product.title}</h3>
+                  <span className="text-sm text-dark-12 bg-brown-70 px-2 py-1 text-[12px] font-semibold rounded-xl">{product.type}</span>
+                  <p className="text-gray-400 my-2 line-clamp-3">{product.description}</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-red-600">
+                    <span className="text-2xl font-bold text-brown-60">
                       {product.price ? `${product.price.toLocaleString()} сум` : 'Цена не указана'}
                     </span>
-                    <button
-                      onClick={() => window.location.href = `/product/${product._id}`}
-                      className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl transition-colors"
+                    <Link
+                      to={`/product/${product._id}`}
+                      className="bg-brown-60 hover:bg-brown-70 px-4 py-2 rounded-xl duration-150 transition-colors"
                     >
                       Подробнее
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>

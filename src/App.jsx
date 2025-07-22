@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -14,8 +14,22 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Checkout from './pages/Checkout';
+import axiosInstance from "./utils/axiosInstance.js";
 
 function App() {
+
+  useEffect(() => {
+    axiosInstance.post('/auth/refresh')
+      .then((res) => {
+        const newAccessToken = res.data.accessToken;
+        window.__AUTH_STORE__ = { accessToken: newAccessToken };
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+      })
+      .catch(() => {
+        // refreshToken просрочен — перенаправить на login
+        // window.location.href = '/login';
+      });
+  }, []);
   return (
     <ErrorBoundary>
       <AuthProvider>
@@ -58,8 +72,13 @@ function App() {
                 />
                 <Route
                   path="/checkout"
-                  element={<Checkout />}
+                  element={
+                    <ProtectedRoute>
+                      <Checkout />
+                    </ProtectedRoute>
+                  }
                 />
+
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

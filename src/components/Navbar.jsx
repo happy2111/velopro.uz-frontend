@@ -145,7 +145,7 @@ const Navbar = () => {
               {
                 text: "",
                 href: "#",
-                className: "my-5   border-dashed !border-0 !border-b-2 border-dark-25 pointer-cursor !bg-transparent !h-1 !w-full"
+                className: "my-7 border-dashed !border-0 !border-b-2 !border-dark-10 pointer-cursor !bg-transparent !h-1 !w-full"
               },
 
             ]}

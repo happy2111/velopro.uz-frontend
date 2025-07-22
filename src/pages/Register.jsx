@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import Button from "../components/Button.jsx";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -95,16 +96,9 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-123px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
-            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">V</span>
-            </div>
-            <span className="text-3xl font-bold gradient-text">VeloPro</span>
-          </Link>
-
           <h2 className="text-3xl font-bold text-[#f5f5f5]">
             Создать аккаунт
           </h2>
@@ -131,8 +125,8 @@ const Register = () => {
                 type="text"
                 value={formData.username}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors text-[#f5f5f5] ${
-                  errors.username ? 'border-red-500' : 'border-gray-700'
+                className={`w-full px-4 py-3 bg-dark-10 border rounded-2xl focus:ring-2 focus:ring-dark-35 focus:border-transparent transition-colors text-[#f5f5f5] ${
+                  errors.username ? 'border-red-500' : 'border-transparent'
                 }`}
                 placeholder="Введите имя пользователя"
               />
@@ -151,8 +145,8 @@ const Register = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors text-[#f5f5f5] ${
-                  errors.email ? 'border-red-500' : 'border-gray-700'
+                className={`w-full px-4 py-3 bg-dark-10 border rounded-2xl focus:ring-2 focus:ring-dark-35 focus:border-transparent transition-colors text-[#f5f5f5] ${
+                  errors.email ? 'border-red-500' : 'border-transparent'
                 }`}
                 placeholder="Введите ваш email"
               />
@@ -171,8 +165,8 @@ const Register = () => {
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors text-[#f5f5f5] ${
-                  errors.phone ? 'border-red-500' : 'border-gray-700'
+                className={`w-full px-4 py-3 bg-dark-10 border rounded-2xl focus:ring-2 focus:ring-dark-35 focus:border-transparent transition-colors text-[#f5f5f5] ${
+                  errors.phone ? 'border-red-500' : 'border-transparent'
                 }`}
                 placeholder="+998 90 123 45 67"
               />
@@ -191,8 +185,8 @@ const Register = () => {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors text-[#f5f5f5] ${
-                  errors.password ? 'border-red-500' : 'border-gray-700'
+                className={`w-full px-4 py-3 bg-dark-10 border rounded-2xl focus:ring-2 focus:ring-dark-35 focus:border-transparent transition-colors text-[#f5f5f5]  ${
+                  errors.password ? 'border-red-500' : 'border-transparent'
                 }`}
                 placeholder="Создайте пароль"
               />
@@ -211,8 +205,8 @@ const Register = () => {
                 type="password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors text-[#f5f5f5] ${
-                  errors.confirmPassword ? 'border-red-500' : 'border-gray-700'
+                className={`w-full px-4 py-3 bg-dark-10 border rounded-2xl focus:ring-2 focus:ring-dark-35 focus:border-transparent transition-colors text-[#f5f5f5] ${
+                  errors.confirmPassword ? 'border-red-500' : 'border-transparent'
                 }`}
                 placeholder="Повторите пароль"
               />
@@ -220,15 +214,13 @@ const Register = () => {
                 <p className="mt-1 text-sm text-red-400">{errors.confirmPassword}</p>
               )}
             </div>
-
-            <button
+            <Button
+              text={loading ? 'Регистрируемся...' : 'Зарегистрироваться'}
+              isTransparent={false}
+              className={`w-full !bg-brown-60 ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
               type="submit"
               disabled={loading}
-              className={`w-full btn-primary ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
-            >
-              {loading ? 'Регистрируемся...' : 'Зарегистрироваться'}
-            </button>
-
+            />
             <div className="text-center">
               <span className="text-gray-400">Уже есть аккаунт? </span>
               <Link to="/login" className="text-red-400 hover:text-red-300 transition-colors">

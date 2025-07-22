@@ -16,7 +16,7 @@ const SideBar = ({sidebarOpen, setSidebarOpen, sidebarItems, isAuthenticated}) =
             onClick={() => setSidebarOpen(false)}
           />
         </div>
-        <nav className="mt-6 px-4  h-full">
+        <nav className="mt-6 px-4 h-full">
           <div className="space-y-2">
             {
               sidebarItems.map((item, index) => (
@@ -33,7 +33,8 @@ const SideBar = ({sidebarOpen, setSidebarOpen, sidebarItems, isAuthenticated}) =
             }
             {isAuthenticated ? (
               <Button
-                isTransparent={false}
+                isTransparent={location.pathname === "/profile" ? false : true}
+                border={location.pathname === "/profile" ? false : true}
                 href={"/profile"}
                 CustomIcon={User}
               />

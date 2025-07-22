@@ -3,13 +3,6 @@
 @import "tailwindcss";
 @tailwind utilities;
 
-
-/** {*/
-/*  margin: 0;*/
-/*  padding: 0;*/
-/*  box-sizing: border-box;*/
-/*}*/
-
 body {
   background-color: var(--color-dark-06);
   -webkit-font-smoothing: antialiased;
@@ -24,18 +17,15 @@ body {
   background-clip: text;
 }
 
-.btn-primary {
-  @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-105;
-}
+
 
 .btn-secondary {
   @apply bg-gray-800 hover:bg-gray-700 text-[#f5f5f5] font-semibold py-3 px-6 rounded-2xl shadow-xl border border-gray-700 transition-all duration-300;
 }
 
-.card {
-  @apply bg-gray-900/50 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-800;
+.swiper-pagination-bullet {
+  @apply bg-brown-60
 }
-
 
 @theme {
   --color-red-50: oklch(0.971 0.013 17.38);
@@ -94,7 +84,7 @@ body {
 
 @layer components {
   .container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-7xl mx-auto px-4;
   }
   .border-custom {
     background-image: repeating-linear-gradient(90deg, #404040, #404040 8px, transparent 8px, transparent 22px), repeating-linear-gradient(180deg, #404040, #404040 8px, transparent 8px, transparent 22px), repeating-linear-gradient(90deg, #404040, #404040 8px, transparent 8px, transparent 22px), repeating-linear-gradient(180deg, #404040, #404040 8px, transparent 8px, transparent 22px);
@@ -125,5 +115,12 @@ body {
     background-position: left top 7px;
     background-repeat: repeat-y;
     background-size: 2px calc(100% * 22);
+  }
+
+  .card {
+    @apply bg-dark-06 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-dashed border-dark-15;
+  }
+  .btn-primary {
+    @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-105;
   }
 }

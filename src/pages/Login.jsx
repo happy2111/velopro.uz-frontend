@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import Button from "../components/Button.jsx";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -74,11 +75,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12  px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-123px)] flex items-center justify-center py-12  px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 ">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-[#f5f5f5]">
-            Вход в аккаунт
+            Log In
           </h2>
           <p className="mt-2 text-gray-400">
             Войдите, чтобы получить доступ к вашему профилю
@@ -103,12 +104,14 @@ const Login = () => {
                 type="text"
                 value={formData.login}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors text-[#f5f5f5] `}
+                className={`w-full px-4 py-3 bg-dark-10 border rounded-2xl focus:ring-2 focus:ring-dark-35 focus:border-transparent transition-colors text-[#f5f5f5]  ${
+                  errors.password ? 'border-red-500' : 'border-transparent'
+                }`}
                 placeholder="Введите ваш email или телефон"
               />
-              {/*{errors.email && (*/}
-              {/*  <p className="mt-1 text-sm text-red-400">{errors.email}</p>*/}
-              {/*)}*/}
+              {errors.login && (
+                <p className="mt-1 text-sm text-red-400">{errors.login}</p>
+              )}
             </div>
 
             <div>
@@ -121,8 +124,8 @@ const Login = () => {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors text-[#f5f5f5] ${
-                  errors.password ? 'border-red-500' : 'border-gray-700'
+                className={`w-full px-4 py-3 bg-dark-10 border rounded-2xl focus:ring-2 focus:ring-dark-35 focus:border-transparent transition-colors text-[#f5f5f5]  ${
+                  errors.password ? 'border-red-500' : 'border-transparent'
                 }`}
                 placeholder="Введите ваш пароль"
               />
@@ -132,30 +135,36 @@ const Login = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 bg-gray-800 border-gray-600 rounded focus:ring-red-500"
-                />
-                <label htmlFor="remember-me" className="ml-2 text-sm text-gray-400">
-                  Запомнить меня
-                </label>
-              </div>
+              {/*<div className="flex items-center">*/}
+              {/*  <input*/}
+              {/*    id="remember-me"*/}
+              {/*    name="remember-me"*/}
+              {/*    type="checkbox"*/}
+              {/*    className="h-4 w-4 bg-gray-800 border-gray-600 rounded focus:ring-red-500"*/}
+              {/*  />*/}
+              {/*  <label htmlFor="remember-me" className="ml-2 text-sm text-gray-400">*/}
+              {/*    Запомнить меня*/}
+              {/*  </label>*/}
+              {/*</div>*/}
 
               <a href="#" className="text-sm text-red-400 hover:text-red-300 transition-colors">
                 Забыли пароль?
               </a>
             </div>
-
-            <button
+            <Button
+              text={loading ? 'Входим...' : 'Войти'}
+              isTransparent={false}
+              className={`w-full !bg-brown-60 ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
               type="submit"
               disabled={loading}
-              className={`w-full btn-primary ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
-            >
-              {loading ? 'Входим...' : 'Войти'}
-            </button>
+            />
+            {/*<button*/}
+            {/*  type="submit"*/}
+            {/*  disabled={loading}*/}
+            {/*  className={`w-full btn-primary ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}*/}
+            {/*>*/}
+            {/*  {loading ? 'Входим...' : 'Войти'}*/}
+            {/*</button>*/}
 
             <div className="text-center">
               <span className="text-gray-400">Нет аккаунта? </span>
