@@ -7,8 +7,9 @@ const Button = ({ text, isTransparent, border, icon, className, href, CustomIcon
     border-2 border-dashed
     ${border && isTransparent ? "border-dark-15"  : "border-brown-60 "}
     flex items-center justify-center
-    transition-colors duration-300 ease-in-out
+    transition-all duration-300 ease-in-out
     active:scale-95
+    hover:scale-103
     ${icon ? 'gap-2' : ''}
     ${isTransparent ? 'hover:bg-dark-08 hover:text-white hover:border-dark-25' : 'hover:bg-dark-12'}
     ${className ?? ''}

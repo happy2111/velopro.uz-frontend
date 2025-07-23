@@ -162,22 +162,22 @@ const Checkout = () => {
     );
   }
 
-  if (cart.length === 0) {
-    return (
-      <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold mb-4">Корзина пуста</h2>
-          <p className="text-gray-400 mb-6">Добавьте товары в корзину перед оформлением заказа</p>
-          <button
-            onClick={() => navigate('/products')}
-            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg transition-colors"
-          >
-            К товарам
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // if (cart.length === 0) {
+  //   return (
+  //     <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
+  //       <div className="text-center">
+  //         <h2 className="text-3xl font-bold mb-4">Корзина пуста</h2>
+  //         <p className="text-gray-400 mb-6">Добавьте товары в корзину перед оформлением заказа</p>
+  //         <button
+  //           onClick={() => navigate('/products')}
+  //           className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg transition-colors"
+  //         >
+  //           К товарам
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5]">

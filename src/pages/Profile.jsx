@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import axiosInstance from '../utils/axiosInstance';
 import axios from "axios";
+import Button from "../components/Button.jsx";
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -81,10 +82,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       setSaving(true);
-      // API для обновления профиля не указан в требованиях
-      // await axiosInstance.put('/api/users/me', formData);
-
-      // Симуляция сохранения
+      const response = await axiosInstance.put(`/api/auth/me`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       setUserData({ ...userData, ...formData });
       setEditing(false);
@@ -128,10 +126,10 @@ const Profile = () => {
     return (
       <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-red-600 mb-4">Необходимо войти в систему</p>
+          <p className="text-xl text-brown-60 mb-4">Необходимо войти в систему</p>
           <button
             onClick={() => window.location.href = '/login'}
-            className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-2xl transition-colors"
+            className="bg-brown-60 hover:bg-brown-65 px-6 py-3 rounded-2xl transition-colors"
           >
             Войти
           </button>
@@ -144,7 +142,7 @@ const Profile = () => {
     return (
       <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brown-60 mx-auto mb-4"></div>
           <p className="text-xl">Загрузка профиля...</p>
         </div>
       </div>
@@ -157,27 +155,23 @@ const Profile = () => {
         <h1 className="text-4xl font-bold mb-8">Личный кабинет</h1>
 
         {/* Tabs */}
-        <div className="flex space-x-1 mb-8">
-          <button
+        <div className="flex space-x-2 mb-8">
+          <Button
+            text={"Profile"}
             onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 rounded-2xl transition-colors ${
+            className={`${
               activeTab === 'profile'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-800 text-gray-400 hover:text-white'
+              && '!bg-brown-60'
             }`}
-          >
-            Профиль
-          </button>
-          <button
+          />
+          <Button
+            text={"Orders"}
             onClick={() => setActiveTab('orders')}
-            className={`px-6 py-3 rounded-2xl transition-colors ${
+            className={`${
               activeTab === 'orders'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-800 text-gray-400 hover:text-white'
+                && '!bg-brown-60'
             }`}
-          >
-            Мои заказы
-          </button>
+          />
         </div>
 
         {/* Profile Tab */}
@@ -185,13 +179,13 @@ const Profile = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Form */}
             <div className="lg:col-span-2">
-              <div className="bg-gray-900 rounded-2xl shadow-xl p-6">
+              <div className="bg-dark-12 rounded-2xl shadow-xl p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold">Информация профиля</h2>
                   {!editing && (
                     <button
                       onClick={() => setEditing(true)}
-                      className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl transition-colors"
+                      className="bg-brown-60 hover:bg-brown-65 px-4 py-2 rounded-xl transition-colors"
                     >
                       Редактировать
                     </button>
@@ -210,7 +204,7 @@ const Profile = () => {
                         name="username"
                         value={formData.username}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 rounded-2xl bg-gray-800 text-[#f5f5f5] border border-gray-700 focus:border-red-600 focus:outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-dark-10 text-[#f5f5f5] border border-dark-25 focus:border-brown-60 focus:outline-none"
                         required
                       />
                     </div>
@@ -225,7 +219,7 @@ const Profile = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 rounded-2xl bg-gray-800 text-[#f5f5f5] border border-gray-700 focus:border-red-600 focus:outline-none"
+                        className="w-full px-4 py-3 rounded-2xl bg-dark-10 text-[#f5f5f5] border border-dark-25 focus:border-brown-60 focus:outline-none"
                         required
                       />
                     </div>
@@ -239,20 +233,21 @@ const Profile = () => {
                         id="phone"
                         name="phone"
                         value={formData.phone}
+                        className="w-full px-4 py-3 rounded-2xl bg-dark-10 text-[#f5f5f5] border border-dark-25 focus:border-brown-60 focus:outline-none"
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 rounded-2xl bg-gray-800 text-[#f5f5f5] border border-gray-700 focus:border-red-600 focus:outline-none"
                       />
                     </div>
 
                     <div className="flex space-x-4">
-                      <button
-                        type="submit"
+                      <Button
+                        text={saving ? 'Сохранение...' : 'Сохранить'}
+                        type={"submit"}
                         disabled={saving}
-                        className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 py-3 rounded-2xl font-bold transition-colors"
-                      >
-                        {saving ? 'Сохранение...' : 'Сохранить'}
-                      </button>
-                      <button
+                        className={"!bg-brown-60 w-1/2"}
+                      />
+
+                      <Button
+                        text={"Cancel"}
                         type="button"
                         onClick={() => {
                           setEditing(false);
@@ -262,10 +257,8 @@ const Profile = () => {
                             phone: userData.phone || ''
                           });
                         }}
-                        className="flex-1 bg-gray-800 hover:bg-gray-700 border border-gray-600 py-3 rounded-2xl font-bold transition-colors"
-                      >
-                        Отмена
-                      </button>
+                        className={"!bg-dark-20 w-1/2"}
+                      />
                     </div>
                   </form>
                 ) : (
@@ -304,23 +297,21 @@ const Profile = () => {
 
             {/* Account Actions */}
             <div className="lg:col-span-1">
-              <div className="bg-gray-900 rounded-2xl shadow-xl p-6">
+              <div className="bg-dark-12 rounded-2xl shadow-xl p-6">
                 <h2 className="text-2xl font-bold mb-6">Действия</h2>
 
                 <div className="space-y-4">
-                  <button
-                    onClick={() => window.location.href = '/cart'}
-                    className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-2xl font-bold transition-colors"
-                  >
-                    Корзина
-                  </button>
-
-                  <button
+                  <Button
+                    text={"Cart"}
+                    href={"/cart"}
+                    className={"!bg-brown-65"}
+                  />
+                  <Button
+                    text={"Logout"}
+                    className={"!bg-dark-20 w-full"}
                     onClick={logout}
-                    className="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 py-3 rounded-2xl font-bold transition-colors"
-                  >
-                    Выйти из системы
-                  </button>
+
+                  />
                 </div>
 
                 {/* Account Stats */}
@@ -341,7 +332,7 @@ const Profile = () => {
 
         {/* Orders Tab */}
         {activeTab === 'orders' && (
-          <div className="bg-gray-900 rounded-2xl shadow-xl p-6">
+          <div className="bg-dark-12 rounded-2xl shadow-xl p-6">
             <h2 className="text-2xl font-bold mb-6">История заказов</h2>
 
             {orders.length === 0 ? (
@@ -353,7 +344,7 @@ const Profile = () => {
                 <p className="text-gray-400 mb-6">Сделайте свой первый заказ в нашем каталоге</p>
                 <button
                   onClick={() => window.location.href = '/products'}
-                  className="bg-red-600 hover:bg-red-700 px-8 py-3 rounded-2xl transition-colors"
+                  className="bg-brown-65 hover:bg-brown-60 px-8 py-3 rounded-2xl transition-colors"
                 >
                   Перейти к каталогу
                 </button>
@@ -361,7 +352,7 @@ const Profile = () => {
             ) : (
               <div className="space-y-6">
                 {orders.map(order => (
-                  <div key={order.id} className="border border-gray-700 rounded-2xl p-6">
+                  <div key={order.id} className="border border-dark-20 rounded-2xl p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="text-lg font-bold mb-1">Заказ №{order.id}</h3>
@@ -381,9 +372,9 @@ const Profile = () => {
                       ))}
                     </div>
 
-                    <div className="pt-4 border-t border-gray-700 flex justify-between items-center">
+                    <div className="pt-4 border-t border-dark-20 flex justify-between items-center">
                       <span className="font-bold">Итого: {order.total.toLocaleString()} сум</span>
-                      <button className="text-red-600 hover:text-red-700 transition-colors">
+                      <button className="text-brown-65 hover:text-brown-90 transition-colors">
                         Подробнее
                       </button>
                     </div>

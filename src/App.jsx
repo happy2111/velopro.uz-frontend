@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import { Routes, Route } from 'react-router-dom';
+import {Routes, Route, Link, Navigate} from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -14,76 +14,85 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Checkout from './pages/Checkout';
-import axiosInstance from "./utils/axiosInstance.js";
+import ScrollTop from "./components/ScrollTop.jsx";
+import NavLayout from "./Layouts/NavLayout.jsx";
+import AdminLayout from "./Layouts/AdminLayout.jsx";
+import AdminProducts from "./pages/AdminPanel/pages/AdminProducts.jsx";
+import AdminUsers from "./pages/AdminPanel/pages/AdminUsers.jsx";
+import AdminOrders from "./pages/AdminPanel/pages/AdminOrders.jsx";
 
 function App() {
-
-  useEffect(() => {
-    axiosInstance.post('/auth/refresh')
-      .then((res) => {
-        const newAccessToken = res.data.accessToken;
-        window.__AUTH_STORE__ = { accessToken: newAccessToken };
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-      })
-      .catch(() => {
-        // refreshToken просрочен — перенаправить на login
-        // window.location.href = '/login';
-      });
-  }, []);
   return (
     <ErrorBoundary>
       <AuthProvider>
         <CartProvider>
           <div className="flex flex-col min-h-screen bg-[#0d0d0d]">
-            <Navbar />
+            <ScrollTop />
             <main className="flex-1">
               <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
+                <Route path={"/"} element={<NavLayout/>}>
+                  <Route path="" element={<Home />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
 
-                {/* Auth routes - redirect to home if already logged in */}
+                  <Route
+                    path="/login"
+                    element={
+                      <ProtectedRoute requireAuth={false}>
+                        <Login />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/register"
+                    element={
+                      <ProtectedRoute requireAuth={false}>
+                        <Register />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* Protected routes - require authentication */}
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/checkout"
+                    element={
+                      <ProtectedRoute>
+                        <Checkout />
+                      </ProtectedRoute>
+                    }
+                  />
+
+
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+
                 <Route
-                  path="/login"
+                  path="/admin"
                   element={
-                    <ProtectedRoute requireAuth={false}>
-                      <Login />
+                    <ProtectedRoute requireAuth={true} requireRole="admin">
+                      <AdminLayout />
                     </ProtectedRoute>
                   }
-                />
-                <Route
-                  path="/register"
-                  element={
-                    <ProtectedRoute requireAuth={false}>
-                      <Register />
-                    </ProtectedRoute>
-                  }
-                />
+                >
+                  <Route path="" element={<Navigate to="products" replace />} />
+                  <Route path={"profile"} element={<Profile/>}/>
+                  <Route path="products" element={<AdminProducts />} />
+                  <Route path="users" element={<AdminUsers/>} />
+                  <Route path="orders" element={<AdminOrders/>} />
+                  <Route path="*" element={<NotFound />} />
+                </Route>
 
-                {/* Protected routes - require authentication */}
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/checkout"
-                  element={
-                    <ProtectedRoute>
-                      <Checkout />
-                    </ProtectedRoute>
-                  }
-                />
-
-
-                <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            <Footer />
           </div>
         </CartProvider>
       </AuthProvider>
@@ -97,7 +106,7 @@ const NotFound = () => {
       <div className="text-center">
         <div className="mb-8">
           <svg
-            className="mx-auto h-32 w-32 text-red-600 mb-4"
+            className="mx-auto h-32 w-32 text-brown-60 mb-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -111,25 +120,25 @@ const NotFound = () => {
           </svg>
         </div>
 
-        <h1 className="text-6xl font-bold text-red-600 mb-4">404</h1>
+        <h1 className="text-6xl font-bold text-brown-60 mb-4">404</h1>
         <h2 className="text-3xl font-bold mb-4">Страница не найдена</h2>
         <p className="text-gray-400 mb-8 max-w-md mx-auto">
           Страница, которую вы ищете, не существует или была перемещена.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="/"
-            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg transition-colors inline-block"
+          <Link
+            to="/"
+            className="bg-brown-60 hover:bg-brown-65 text-white px-8 py-3 rounded-lg transition-colors inline-block"
           >
             На главную
-          </a>
-          <a
-            href="/products"
-            className="bg-gray-800 hover:bg-gray-700 text-[#f5f5f5] px-8 py-3 rounded-lg transition-colors inline-block"
+          </Link>
+          <Link
+            to="/products"
+            className="bg-dark-10 hover:bg-dark-20 text-[#f5f5f5] px-8 py-3 rounded-lg transition-colors inline-block"
           >
             К товарам
-          </a>
+          </Link>
         </div>
       </div>
     </div>

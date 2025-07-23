@@ -5,9 +5,11 @@ import Button from "./Button.jsx";
 import { useLocation } from "react-router-dom";
 import {ShoppingCart, Menu, User, Sidebar} from "lucide-react"
 import SideBar from "./SideBar.jsx";
+import { useCart } from '../context/CartContext.jsx';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { getCartItemsCount } = useCart();
   const [cartCount, setCartCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -77,12 +79,15 @@ const Navbar = () => {
           </Link>
 
           <div className={"flex gap-2 max-md:hidden"}>
+            <div className={`relative ${getCartItemsCount() < 0 && "hidden"}`}>
+              <span className={"absolute z-30 -top-2 -left-2 text-gray-95 bg-brown-60 rounded-full w-7 h-7 grid place-content-center"}>{getCartItemsCount()}</span>
             <Button
               text={""}
               isTransparent={false}
               href={"/cart"}
               CustomIcon={ShoppingCart}
             />
+            </div>
             {isAuthenticated ? (
               <Button
                 isTransparent={false}
@@ -109,11 +114,15 @@ const Navbar = () => {
 
           {/* Mobile меню */}
           <div className="md:hidden flex items-center space-x-4">
-            <Button
-              isTransparent={false}
-              href={"/cart"}
-              CustomIcon={ShoppingCart}
-            />
+            <div>
+              {getCartItemsCount()}
+              <Button
+                isTransparent={false}
+                href={"/cart"}
+                CustomIcon={ShoppingCart}
+              />
+            </div>
+
             {isAuthenticated && (
               <div className="relative">
                 <Button

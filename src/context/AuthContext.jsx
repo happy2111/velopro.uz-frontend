@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
 
-
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -28,17 +27,46 @@ export const AuthProvider = ({ children }) => {
   // Проверяем авторизацию при первом запуске
   useEffect(() => {
     const checkAuth = async () => {
+      // Если нет токена в localStorage, сразу завершаем проверку
+      const storedToken = localStorage.getItem('accessToken');
+      if (!storedToken) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const response = await axiosInstance.post('/api/auth/refresh');
-        const newToken = response.data.accessToken;
+        // Сначала пытаемся получить данные пользователя с текущим токеном
+        let userResponse;
+        try {
+          userResponse = await axiosInstance.get('/api/auth/me');
+          setUser(userResponse.data);
+          localStorage.setItem('user', JSON.stringify(userResponse.data));
+          setLoading(false);
+          return;
+        } catch (error) {
+          // Если текущий токен не работает, пытаемся обновить
+          if (error.response?.status === 401) {
+            console.log('Token expired, trying to refresh...');
+          } else {
+            throw error;
+          }
+        }
+
+        // Пытаемся обновить токен
+        const refreshResponse = await axiosInstance.post('/api/auth/refresh');
+        const newToken = refreshResponse.data.accessToken;
+
         localStorage.setItem('accessToken', JSON.stringify(newToken));
         setAccessToken(newToken);
 
-        const userResponse = await axiosInstance.get('/api/users/me');
+        // Получаем данные пользователя с новым токеном
+        userResponse = await axiosInstance.get('/api/users/me');
         setUser(userResponse.data);
         localStorage.setItem('user', JSON.stringify(userResponse.data));
+
       } catch (error) {
-        console.log('No valid session found');
+        console.log('Authentication check failed:', error.message);
+        // Очищаем все данные авторизации
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
         setAccessToken(null);
@@ -63,6 +91,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(userData));
       setAccessToken(token);
       setUser(userData);
+
+      // Синхронизируем корзину после успешного логина
       await syncCartWithBackend();
 
       return { success: true };
@@ -97,8 +127,10 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
+      // Очищаем все данные
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
+      localStorage.removeItem('cart'); // Очищаем корзину при выходе
       setAccessToken(null);
       setUser(null);
     }
@@ -128,8 +160,13 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    isAuthenticated: !!accessToken,
+    isAuthenticated: !!accessToken && !!user, // Проверяем и токен, и пользователя
   };
+
+  if (loading) {
+    // Можете показать спиннер загрузки
+    return <div>Загрузка...</div>;
+  }
 
   return (
     <AuthContext.Provider value={value}>

@@ -2,9 +2,11 @@ import React, {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import ProductDetailSwiper from "../components/ProductDetailSwiper.jsx";
+import { useCart } from '../context/CartContext';
 
 const ProductDetail = () => {
   const {id} = useParams();
+  const {addToCart} = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,6 +22,7 @@ const ProductDetail = () => {
       setLoading(true);
       const response = await axiosInstance.get(`/api/products/${id}`);
       setProduct(response.data);
+      console.log(response.data);
     } catch (err) {
       setError('Товар не найден');
       console.error('Product fetch error:', err);
@@ -28,38 +31,17 @@ const ProductDetail = () => {
     }
   };
 
-  const addToCart = async () => {
-    try {
-      setAddingToCart(true);
-      await axiosInstance.post('/api/cart', {
-        productId: id,
-        quantity
-      });
+  const handleAddToCart = async () => {
 
-      // Show success message
-      const successDiv = document.createElement('div');
-      successDiv.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-2xl shadow-xl z-50';
-      successDiv.textContent = 'Товар добавлен в корзину!';
-      document.body.appendChild(successDiv);
+    const success = await addToCart(product, quantity); // product — это объект с id, name, price и т.д.
 
-      setTimeout(() => {
-        document.body.removeChild(successDiv);
-      }, 3000);
-
-    } catch (err) {
-      console.error('Add to cart error:', err);
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-2xl shadow-xl z-50';
-      errorDiv.textContent = 'Ошибка при добавлении в корзину';
-      document.body.appendChild(errorDiv);
-
-      setTimeout(() => {
-        document.body.removeChild(errorDiv);
-      }, 3000);
-    } finally {
-      setAddingToCart(false);
+    if (success) {
+      alert('Товар добавлен в корзину', 'success');
+    } else {
+      alert('Ошибка при добавлении в корзину', 'error');
     }
   };
+
 
   if (loading) {
     return (
@@ -201,7 +183,7 @@ const ProductDetail = () => {
             </div>
             <div className="max-sm:sticky bottom-0 p-3 bg-dark-06 rounded-t-2xl flex space-x-4">
               <button
-                onClick={addToCart}
+                onClick={handleAddToCart}
                 disabled={addingToCart}
                 className="flex-1 bg-brown-60 hover:bg-brown-70 disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 rounded-2xl text-lg font-bold transition-colors"
               >

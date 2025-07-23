@@ -17,19 +17,13 @@ const CART_ACTIONS = {
 // Cart reducer
 const cartReducer = (state, action) => {
   switch (action.type) {
-    case CART_ACTIONS.SET_LOADING:
-      return { ...state, loading: action.payload };
-
-    case CART_ACTIONS.SET_CART:
-      return { ...state, items: action.payload, loading: false };
-
     case CART_ACTIONS.ADD_ITEM:
-      const existingItem = state.items.find(item => item.id === action.payload.id);
+      const existingItem = state.items.find(item => item._id === action.payload._id);
       if (existingItem) {
         return {
           ...state,
           items: state.items.map(item =>
-            item.id === action.payload.id
+            item._id === action.payload._id
               ? { ...item, quantity: item.quantity + action.payload.quantity }
               : item
           )
@@ -42,7 +36,7 @@ const cartReducer = (state, action) => {
       return {
         ...state,
         items: state.items.map(item =>
-          item.id === action.payload.id
+          item._id === action.payload._id
             ? { ...item, quantity: action.payload.quantity }
             : item
         )
@@ -51,8 +45,14 @@ const cartReducer = (state, action) => {
     case CART_ACTIONS.REMOVE_ITEM:
       return {
         ...state,
-        items: state.items.filter(item => item.id !== action.payload)
+        items: state.items.filter(item => item._id !== action.payload)
       };
+
+    case CART_ACTIONS.SET_LOADING:
+      return { ...state, loading: action.payload };
+
+    case CART_ACTIONS.SET_CART:
+      return { ...state, items: action.payload, loading: false };
 
     case CART_ACTIONS.CLEAR_CART:
       return { ...state, items: [] };
@@ -77,7 +77,6 @@ export const CartProvider = ({ children }) => {
     loadCart();
   }, [user]);
 
-  // Save to localStorage when cart changes (for non-logged in users)
   useEffect(() => {
     if (!user && state.items.length > 0) {
       localStorage.setItem('cart', JSON.stringify(state.items));
@@ -91,7 +90,16 @@ export const CartProvider = ({ children }) => {
       if (user) {
         // Load from server
         const response = await axiosInstance.get('/api/cart');
-        dispatch({ type: CART_ACTIONS.SET_CART, payload: response.data.items || [] });
+        // ✅ ИСПРАВЛЕНО: Преобразуем структуру бэкенда в формат фронтенда
+        const cartItems = response.data.products ? response.data.products.map(item => ({
+          _id: item.product._id,
+          title: item.product.title,
+          price: item.product.price,
+          images: item.product.images,
+          quantity: item.quantity
+        })) : [];
+
+        dispatch({ type: CART_ACTIONS.SET_CART, payload: cartItems });
       } else {
         // Load from localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -108,23 +116,34 @@ export const CartProvider = ({ children }) => {
   const addToCart = async (product, quantity = 1) => {
     try {
       const cartItem = {
-        id: product.id,
-        name: product.name,
+        _id: product._id,
+        title: product.title,
         price: product.price,
-        image: product.image,
+        images: product.images, // ✅ ИСПРАВЛЕНО: images вместо image
         quantity: quantity
       };
 
       if (user) {
         // Add to server cart
-        await axiosInstance.post('/api/cart', {
-          productId: product.id,
+        const response = await axiosInstance.post('/api/cart', {
+          productId: product._id,
           quantity: quantity
         });
+
+        // ✅ ИСПРАВЛЕНО: Обновляем состояние из ответа сервера
+        const cartItems = response.data.products ? response.data.products.map(item => ({
+          _id: item.product._id,
+          title: item.product.title,
+          price: item.product.price,
+          images: item.product.images,
+          quantity: item.quantity
+        })) : [];
+
+        dispatch({ type: CART_ACTIONS.SET_CART, payload: cartItems });
       } else {
         // Add to local cart
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const existingItem = localCart.find(item => item.id === product.id);
+        const existingItem = localCart.find(item => item._id === product._id);
 
         if (existingItem) {
           existingItem.quantity += quantity;
@@ -133,9 +152,9 @@ export const CartProvider = ({ children }) => {
         }
 
         localStorage.setItem('cart', JSON.stringify(localCart));
+        dispatch({ type: CART_ACTIONS.ADD_ITEM, payload: cartItem });
       }
 
-      dispatch({ type: CART_ACTIONS.ADD_ITEM, payload: cartItem });
       return true;
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -146,25 +165,36 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (productId, quantity) => {
     try {
       if (quantity <= 0) {
-        return removeFromCart(productId);
+        return removeItem(productId); // ✅ ИСПРАВЛЕНО: используем removeItem
       }
 
       if (user) {
         // Update on server
-        await axiosInstance.put(`/api/cart/${productId}`, { quantity });
+        const response = await axiosInstance.put(`/api/cart/${productId}`, { quantity });
+
+        // ✅ ИСПРАВЛЕНО: Обновляем состояние из ответа сервера
+        const cartItems = response.data.products ? response.data.products.map(item => ({
+          _id: item.product._id,
+          title: item.product.title,
+          price: item.product.price,
+          images: item.product.images,
+          quantity: item.quantity
+        })) : [];
+
+        dispatch({ type: CART_ACTIONS.SET_CART, payload: cartItems });
       } else {
         // Update localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
         const updatedCart = localCart.map(item =>
-          item.id === productId ? { ...item, quantity } : item
+          item._id === productId ? { ...item, quantity } : item
         );
         localStorage.setItem('cart', JSON.stringify(updatedCart));
-      }
 
-      dispatch({
-        type: CART_ACTIONS.UPDATE_ITEM,
-        payload: { id: productId, quantity }
-      });
+        dispatch({
+          type: CART_ACTIONS.UPDATE_ITEM,
+          payload: { _id: productId, quantity } // ✅ ИСПРАВЛЕНО: _id вместо id
+        });
+      }
       return true;
     } catch (error) {
       console.error('Error updating cart:', error);
@@ -172,19 +202,32 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = async (productId) => {
+  // ✅ ИСПРАВЛЕНО: Переименовано в removeItem для соответствия Cart компоненту
+  const removeItem = async (productId) => {
     try {
       if (user) {
         // Remove from server
-        await axiosInstance.delete(`/api/cart/${productId}`);
+        const response = await axiosInstance.delete(`/api/cart/${productId}`);
+
+        // ✅ ИСПРАВЛЕНО: Обновляем состояние из ответа сервера
+        const cartItems = response.data.products ? response.data.products.map(item => ({
+          _id: item.product._id,
+          title: item.product.title,
+          price: item.product.price,
+          images: item.product.images,
+          quantity: item.quantity
+        })) : [];
+
+        dispatch({ type: CART_ACTIONS.SET_CART, payload: cartItems });
       } else {
         // Remove from localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const updatedCart = localCart.filter(item => item.id !== productId);
+        const updatedCart = localCart.filter(item => item._id !== productId);
         localStorage.setItem('cart', JSON.stringify(updatedCart));
+
+        dispatch({ type: CART_ACTIONS.REMOVE_ITEM, payload: productId });
       }
 
-      dispatch({ type: CART_ACTIONS.REMOVE_ITEM, payload: productId });
       return true;
     } catch (error) {
       console.error('Error removing from cart:', error);
@@ -217,19 +260,29 @@ export const CartProvider = ({ children }) => {
       const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
       if (localCart.length === 0) return;
 
-      // Sync each item with server
-      for (const item of localCart) {
-        await axiosInstance.post('/api/cart', {
-          productId: item.id,
-          quantity: item.quantity
-        });
-      }
+      // ✅ ИСПРАВЛЕНО: Используем правильную структуру для синхронизации
+      const productsToSync = localCart.map(item => ({
+        product: item._id,
+        quantity: item.quantity
+      }));
+
+      const response = await axiosInstance.post('/api/cart/sync', {
+        products: productsToSync
+      });
 
       // Clear localStorage after sync
       localStorage.removeItem('cart');
 
-      // Reload cart from server
-      loadCart();
+      // ✅ ИСПРАВЛЕНО: Обновляем состояние из ответа сервера
+      const cartItems = response.data.products ? response.data.products.map(item => ({
+        _id: item.product._id,
+        title: item.product.title,
+        price: item.product.price,
+        images: item.product.images,
+        quantity: item.quantity
+      })) : [];
+
+      dispatch({ type: CART_ACTIONS.SET_CART, payload: cartItems });
     } catch (error) {
       console.error('Error syncing cart:', error);
     }
@@ -244,11 +297,11 @@ export const CartProvider = ({ children }) => {
   };
 
   const value = {
-    cart: state.items,
+    cartItems: state.items,
     loading: state.loading,
     addToCart,
     updateQuantity,
-    removeFromCart,
+    removeItem, // ✅ ИСПРАВЛЕНО: экспортируем removeItem
     clearCart,
     loadCart,
     syncCartWithServer,

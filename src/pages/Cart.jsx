@@ -1,130 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import axiosInstance from '../utils/axiosInstance';
+import { useCart } from "../context/CartContext.jsx";
 
 const Cart = () => {
+  const { cartItems, loadCart, updateQuantity, removeItem, clearCart, getCartTotal } = useCart();
   const { user } = useAuth();
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [updatingItems, setUpdatingItems] = useState(new Set());
+  const [updatingItems, setUpdatingItems] = useState(new Set()); // ✅ ДОБАВЛЕНО: для отслеживания обновляемых товаров
 
   useEffect(() => {
     loadCart();
   }, [user]);
 
-  const loadCart = async () => {
+  // ✅ ДОБАВЛЕНО: Функция для обновления с индикатором загрузки
+  const handleUpdateQuantity = async (itemId, newQuantity) => {
+    setUpdatingItems(prev => new Set(prev).add(itemId));
     try {
-      setLoading(true);
-
-      if (user) {
-        // Загрузить корзину с сервера
-        const response = await axiosInstance.get('/api/cart');
-        setCartItems(response.data.products || []);
-        console.log('Cart loaded from server:', response.data.products);
-      } else {
-        // Загрузить корзину из localStorage
-        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        setCartItems(localCart);
-      }
-    } catch (err) {
-      setError('Ошибка загрузки корзины');
-      console.error('Cart load error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateQuantity = async (productId, newQuantity) => {
-    if (newQuantity < 1) {
-      removeItem(productId);
-      return;
-    }
-
-    setUpdatingItems(prev => new Set(prev).add(productId));
-
-    try {
-      if (user) {
-        // Обновить на сервере
-        await axiosInstance.put(`/api/cart/${productId}`, { quantity: newQuantity });
-      } else {
-        // Обновить в localStorage
-        const updatedCart = cartItems.map(item =>
-          item.productId === productId ? { ...item, quantity: newQuantity } : item
-        );
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
-        setCartItems(updatedCart);
-      }
-
-      if (user) {
-        loadCart(); // Перезагрузить корзину с сервера
-      }
-    } catch (err) {
-      console.error('Update quantity error:', err);
+      await updateQuantity(itemId, newQuantity);
     } finally {
       setUpdatingItems(prev => {
         const newSet = new Set(prev);
-        newSet.delete(productId);
+        newSet.delete(itemId);
         return newSet;
       });
     }
   };
 
-  const removeItem = async (productId) => {
-    setUpdatingItems(prev => new Set(prev).add(productId));
-
+  // ✅ ДОБАВЛЕНО: Функция для удаления с индикатором загрузки
+  const handleRemoveItem = async (itemId) => {
+    setUpdatingItems(prev => new Set(prev).add(itemId));
     try {
-      if (user) {
-        // Удалить на сервере
-        await axiosInstance.delete(`/api/cart/${productId}`);
-      } else {
-        // Удалить из localStorage
-        const updatedCart = cartItems.filter(item => item.productId !== productId);
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
-        setCartItems(updatedCart);
-      }
-
-      if (user) {
-        loadCart(); // Перезагрузить корзину с сервера
-      }
-    } catch (err) {
-      console.error('Remove item error:', err);
+      await removeItem(itemId);
     } finally {
       setUpdatingItems(prev => {
         const newSet = new Set(prev);
-        newSet.delete(productId);
+        newSet.delete(itemId);
         return newSet;
       });
     }
   };
-
-  const clearCart = async () => {
-    if (!window.confirm('Очистить корзину?')) return;
-
-    try {
-      if (user) {
-        // Очистить все товары на сервере
-        for (const item of cartItems) {
-          await axiosInstance.delete(`/api/cart/${item.productId}`);
-        }
-      } else {
-        // Очистить localStorage
-        localStorage.removeItem('cart');
-        setCartItems([]);
-      }
-
-      if (user) {
-        loadCart();
-      }
-    } catch (err) {
-      console.error('Clear cart error:', err);
-    }
-  };
-
-  const totalPrice = cartItems.reduce((sum, item) => {
-    return sum + (item.product?.price || 0) * item.quantity;
-  }, 0);
 
   if (loading) {
     return (
@@ -161,7 +77,7 @@ const Cart = () => {
           {cartItems.length > 0 && (
             <button
               onClick={clearCart}
-              className="text-gray-400 hover:text-red-600 transition-colors"
+              className="text-gray-40 hover:text-brown-60 transition-colors"
             >
               Очистить корзину
             </button>
@@ -177,7 +93,7 @@ const Cart = () => {
             <p className="text-gray-400 mb-6">Добавьте товары в корзину, чтобы продолжить покупки</p>
             <Link
               to="/products"
-              className="bg-red-600 hover:bg-red-700 px-8 py-3 rounded-2xl transition-colors inline-block"
+              className="bg-brown-65 hover:bg-brown-60 px-8 py-3 rounded-2xl transition-colors inline-block"
             >
               Перейти к каталогу
             </Link>
@@ -187,14 +103,14 @@ const Cart = () => {
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map(item => (
-                <div key={item.product._id} className="bg-gray-900 rounded-2xl shadow-xl p-6">
+                <div key={item._id} className="bg-dark-10 rounded-2xl shadow-xl p-6">
                   <div className="flex items-center space-x-4">
                     {/* Product Image */}
-                    <div className="w-20 h-20 bg-gray-800 rounded-xl flex-shrink-0">
-                      {item.product?.images.length > 0 ? (
+                    <div className="w-20 h-20 bg-dark-12 rounded-xl flex-shrink-0">
+                      {item?.images?.[0] ? (
                         <img
-                          src={`${import.meta.env.VITE_API_BASE_URL}${item.product.images[0]}`}
-                          alt={item.product.name}
+                          src={`${import.meta.env.VITE_API_BASE_URL}${item.images[0]}`}
+                          alt={item.title}
                           className="w-full h-full object-cover rounded-xl"
                         />
                       ) : (
@@ -209,19 +125,19 @@ const Cart = () => {
                     {/* Product Info */}
                     <div className="flex-1">
                       <h3 className="text-lg font-bold mb-1">
-                        {item.product?.title || 'Неизвестный товар'}
+                        {item?.title || 'Неизвестный товар'}
                       </h3>
-                      <p className="text-gray-400 text-sm">
-                        {item.product?.price ? `${item.product.price.toLocaleString()} сум` : 'Цена не указана'}
+                      <p className="text-gray-40 text-sm">
+                        {item?.price ? `${item.price.toLocaleString()} сум` : 'Цена не указана'}
                       </p>
                     </div>
 
                     {/* Quantity Controls */}
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => updateQuantity(item.product._id, item.quantity - 1)}
-                        disabled={updatingItems.has(item.product._id)}
-                        className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center disabled:opacity-50"
+                        onClick={() => handleUpdateQuantity(item._id, item.quantity - 1)}
+                        disabled={updatingItems.has(item._id)}
+                        className="w-8 h-8 bg-dark-15 hover:bg-dark-12 rounded-lg flex items-center justify-center disabled:opacity-50"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -229,13 +145,14 @@ const Cart = () => {
                       </button>
 
                       <span className="w-8 text-center font-medium">
-                        {updatingItems.has(item.product._id) ? '...' : item.quantity}
+                        {/* ✅ ИСПРАВЛЕНО: Показываем количество или индикатор загрузки */}
+                        {updatingItems.has(item._id) ? '...' : item.quantity}
                       </span>
 
                       <button
-                        onClick={() => updateQuantity(item.product._id, item.quantity + 1)}
-                        disabled={updatingItems.has(item.product._id )}
-                        className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center disabled:opacity-50"
+                        onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}
+                        disabled={updatingItems.has(item._id)}
+                        className="w-8 h-8 bg-dark-15 hover:bg-dark-12 rounded-lg flex items-center justify-center disabled:opacity-50"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -245,9 +162,9 @@ const Cart = () => {
 
                     {/* Remove Button */}
                     <button
-                      onClick={() => removeItem(item.product._id)}
-                      disabled={updatingItems.has(item.product._id)}
-                      className="text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                      onClick={() => handleRemoveItem(item._id)}
+                      disabled={updatingItems.has(item._id)}
+                      className="text-gray-40 hover:text-red-600 transition-colors disabled:opacity-50"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -256,10 +173,11 @@ const Cart = () => {
                   </div>
 
                   {/* Item Total */}
-                  <div className="mt-4 pt-4 border-t border-gray-800 text-right">
+                  <div className="mt-4 pt-4 border-t border-dark-20 text-right">
                     <span className="text-lg font-bold">
-                      {item.product?.price ?
-                        `${(item.product.price * item.quantity).toLocaleString()} сум` :
+                      {/* ✅ ИСПРАВЛЕНО: Показываем правильную сумму за товар */}
+                      {item?.price ?
+                        `${(item.price * item.quantity).toLocaleString()} сум` :
                         'Цена не указана'
                       }
                     </span>
@@ -270,30 +188,30 @@ const Cart = () => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-gray-900 rounded-2xl shadow-xl p-6 sticky top-4">
+              <div className="bg-dark-12 rounded-2xl shadow-xl p-6 sticky top-4">
                 <h2 className="text-2xl font-bold mb-6">Итого</h2>
 
                 <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-gray-400">
+                  <div className="flex justify-between text-gray-70">
                     <span>Товаров:</span>
                     <span>{cartItems.length}</span>
                   </div>
 
-                  <div className="flex justify-between text-gray-400">
+                  <div className="flex justify-between text-gray-70">
                     <span>Количество:</span>
                     <span>{cartItems.reduce((sum, item) => sum + item.quantity, 0)} шт.</span>
                   </div>
 
-                  <div className="flex justify-between text-gray-400">
+                  <div className="flex justify-between text-gray-70">
                     <span>Доставка:</span>
                     <span>Бесплатно</span>
                   </div>
 
-                  <div className="border-t border-gray-700 pt-4">
+                  <div className="border-t border-dark-20 pt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-xl font-bold">Всего:</span>
-                      <span className="text-2xl font-bold text-red-600">
-                        {totalPrice.toLocaleString()} сум
+                      <span className="text-2xl font-bold text-brown-60">
+                        {getCartTotal().toLocaleString()} сум
                       </span>
                     </div>
                   </div>
@@ -302,29 +220,29 @@ const Cart = () => {
                 <div className="space-y-3">
                   <Link
                     to="/checkout"
-                    className="w-full bg-red-600 hover:bg-red-700 py-4 rounded-2xl text-center font-bold transition-colors block"
+                    className="w-full bg-brown-65 hover:bg-brown-60 hover:scale-101 transition-all duration-150 py-4 rounded-2xl text-center font-bold block"
                   >
                     Оформить заказ
                   </Link>
 
                   <Link
                     to="/products"
-                    className="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 py-4 rounded-2xl text-center font-bold transition-colors block"
+                    className="w-full bg-dark-20 hover:bg-dark-15 hover:scale-101 transition-all duration-150 py-4 rounded-2xl text-center font-bold block"
                   >
                     Продолжить покупки
                   </Link>
                 </div>
 
                 {/* Promo Code */}
-                <div className="mt-6 pt-6 border-t border-gray-700">
+                <div className="mt-6 pt-6 border-t border-dark-20">
                   <h3 className="font-bold mb-3">Промокод</h3>
                   <div className="flex space-x-2">
                     <input
                       type="text"
                       placeholder="Введите промокод"
-                      className="flex-1 px-3 py-2 rounded-xl bg-gray-800 text-[#f5f5f5] border border-gray-700 focus:border-red-600 focus:outline-none text-sm"
+                      className="flex-1 px-3 py-2 rounded-xl bg-dark-12 text-gray-95 border border-dark-20 focus:border-brown-60 focus:outline-none text-sm"
                     />
-                    <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-xl transition-colors text-sm">
+                    <button className="px-4 py-2 bg-dark-20 hover:bg-dark-15 hover:scale-101 rounded-xl transition-all text-sm">
                       Применить
                     </button>
                   </div>
