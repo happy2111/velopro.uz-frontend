@@ -20,12 +20,14 @@ import AdminLayout from "./Layouts/AdminLayout.jsx";
 import AdminProducts from "./pages/AdminPanel/pages/AdminProducts.jsx";
 import AdminUsers from "./pages/AdminPanel/pages/AdminUsers.jsx";
 import AdminOrders from "./pages/AdminPanel/pages/AdminOrders.jsx";
+import {Toaster} from "react-hot-toast";
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <CartProvider>
+          <Toaster position="top-center" reverseOrder={false}/>
           <div className="flex flex-col min-h-screen bg-[#0d0d0d]">
             <ScrollTop />
             <main className="flex-1">

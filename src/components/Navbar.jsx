@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import React, {useState, useEffect} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
+import {useAuth} from '../hooks/useAuth';
 import Button from "./Button.jsx";
-import { useLocation } from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import {ShoppingCart, Menu, User, Sidebar} from "lucide-react"
 import SideBar from "./SideBar.jsx";
-import { useCart } from '../context/CartContext.jsx';
+import {useCart} from '../context/CartContext.jsx';
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
-  const { getCartItemsCount } = useCart();
+  const {user, isAuthenticated, logout} = useAuth();
+  const {getCartItemsCount} = useCart();
   const [cartCount, setCartCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -74,19 +74,22 @@ const Navbar = () => {
             />
           </div>
 
-          <Link to="/" className="md:absolute left-1/2 md:-translate-x-1/2 space-x-2">
+          <Link
+            to="/"
+            className="md:absolute left-1/2 md:-translate-x-1/2 space-x-2"
+          >
             <span className="text-2xl font-bold font-roboto text-white ">VeloPro</span>
           </Link>
 
           <div className={"flex gap-2 max-md:hidden"}>
-            <div className={`relative ${getCartItemsCount() < 0 && "hidden"}`}>
-              <span className={"absolute z-30 -top-2 -left-2 text-gray-95 bg-brown-60 rounded-full w-7 h-7 grid place-content-center"}>{getCartItemsCount()}</span>
-            <Button
-              text={""}
-              isTransparent={false}
-              href={"/cart"}
-              CustomIcon={ShoppingCart}
-            />
+            <div className={`relative `}>
+              <span className={`${getCartItemsCount() === null && "hidden"} absolute z-30 -top-2 -left-2 text-gray-95 bg-brown-60 rounded-full w-7 h-7 grid place-content-center`}>{getCartItemsCount()}</span>
+              <Button
+                text={""}
+                isTransparent={false}
+                href={"/cart"}
+                CustomIcon={ShoppingCart}
+              />
             </div>
             {isAuthenticated ? (
               <Button
@@ -114,9 +117,10 @@ const Navbar = () => {
 
           {/* Mobile меню */}
           <div className="md:hidden flex items-center space-x-4">
-            <div>
-              {getCartItemsCount()}
+            <div className={`relative ${getCartItemsCount() < 0 && "hidden"}`}>
+              <span className={"absolute z-30 -top-2 -left-2 text-gray-95 bg-brown-60 rounded-full w-7 h-7 grid place-content-center"}>{getCartItemsCount()}</span>
               <Button
+                text={""}
                 isTransparent={false}
                 href={"/cart"}
                 CustomIcon={ShoppingCart}
@@ -126,15 +130,14 @@ const Navbar = () => {
             {isAuthenticated && (
               <div className="relative">
                 <Button
-                    isTransparent={false}
-                    href={"/profile"}
-                    CustomIcon={User}
+                  isTransparent={false}
+                  href={"/profile"}
+                  CustomIcon={User}
                 />
 
               </div>
             )}
           </div>
-
 
 
           {/* Mobile меню открывается при клике на иконку Menu */}

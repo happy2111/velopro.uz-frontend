@@ -1,8 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {useParams} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import ProductDetailSwiper from "../components/ProductDetailSwiper.jsx";
-import { useCart } from '../context/CartContext';
+import {useCart} from '../context/CartContext';
+import ShareButton from "../components/ShareButton.jsx";
+import Button from "../components/Button.jsx";
+import {ArrowLeftFromLineIcon} from "lucide-react";
+import toast from "react-hot-toast";
 
 const ProductDetail = () => {
   const {id} = useParams();
@@ -12,10 +16,13 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [isAdded, setIsAdded] = useState(false)
 
   useEffect(() => {
     fetchProduct();
   }, [id]);
+
+
 
   const fetchProduct = async () => {
     try {
@@ -33,10 +40,18 @@ const ProductDetail = () => {
 
   const handleAddToCart = async () => {
 
-    const success = await addToCart(product, quantity); // product — это объект с id, name, price и т.д.
+    const success = await addToCart(product, quantity);
+
 
     if (success) {
-      alert('Товар добавлен в корзину', 'success');
+      toast.success('Товар добавлен в корзину', {
+        style: {
+          borderRadius: '8px',
+          background: 'var(--color-dark-12)',
+          color: 'var(--color-gray-95)',
+        },
+      });
+      setIsAdded(true)
     } else {
       alert('Ошибка при добавлении в корзину', 'error');
     }
@@ -58,10 +73,10 @@ const ProductDetail = () => {
     return (
       <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-red-600 mb-4">{error}</p>
+          <p className="text-xl text-brown-60 mb-4">{error}</p>
           <button
             onClick={() => window.history.back()}
-            className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-2xl transition-colors"
+            className="bg-brown-60 hover:bg-brown-65 px-6 py-3 rounded-2xl transition-colors"
           >
             Вернуться назад
           </button>
@@ -70,9 +85,26 @@ const ProductDetail = () => {
     );
   }
 
+
+  const currectUrl = window.location.href
+
   return (
     <div className="min-h-[calc(100vh-123px)] relative bgdark-06 text-[#f5f5f5]">
       <div className="container mx-auto px-4 py-8 ">
+        <div className={'flex justify-between mb-5'}>
+          <Button
+            text={"Back"}
+            CustomIcon={ArrowLeftFromLineIcon}
+            className={"gap-2"}
+            onClick={() => window.history.back()}
+          />
+          <ShareButton
+            title={product.title}
+            text={product.description}
+            url={currectUrl}
+          />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Product Image */}
           <div className="bg-dark-12 max-h-[calc(100vh-200px)] rounded-2xl shadow-xl productDetailSwiper overflow-hidden">
@@ -185,17 +217,30 @@ const ProductDetail = () => {
               <button
                 onClick={handleAddToCart}
                 disabled={addingToCart}
-                className="flex-1 bg-brown-60 hover:bg-brown-70 disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 rounded-2xl text-lg font-bold transition-colors"
+                className={`active:scale-95  ${isAdded ? "bg-dark-15" : "bg-brown-60 hover:bg-brown-70 flex-1"}  disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 rounded-2xl text-lg font-bold transition-colors`}
               >
-                {addingToCart ? 'Добавление...' : 'Добавить в корзину'}
+                {addingToCart ? 'Добавление...' : !isAdded ? "Добавить" : "+1"}
               </button>
+              {isAdded ?
 
-              <button
-                onClick={() => window.location.href = '/checkout'}
-                className="flex-1 bg-dark-12 hover:bg-gray-700 border border-brown-60 duration-150 px-8 py-4 rounded-2xl text-lg font-bold transition-colors"
-              >
-                Купить сейчас
-              </button>
+                (
+                  <Link
+                    to={"/cart"}
+                    className="flex-1 flex flex-col items-center justify-center bg-brown-60 hover:bg-dark-15 border border-brown-60 duration-150 px-8 py-4 rounded-2xl text-lg font-bold transition-colors"
+                  >
+                    В Карзине
+                    <span className={"opacity-75 text-base block"}>Перейти</span>
+                  </Link>
+                ): (<button
+                  onClick={() => window.location.href = '/checkout'}
+                  className="flex-1 bg-dark-12 hover:bg-gray-700 border border-brown-60 duration-150 px-8 py-4 rounded-2xl text-lg font-bold transition-colors"
+                >
+                  Купить сейчас
+                </button>)}
+
+
+
+
             </div>
 
 
@@ -221,6 +266,8 @@ const ProductDetail = () => {
                 </svg>
                 <span>Гарантия 1 год</span>
               </div>
+
+
             </div>
           </div>
         </div>

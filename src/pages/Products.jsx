@@ -112,7 +112,7 @@ const Products = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map(product => (
-              <div key={product._id} className="bg-dark-12 rounded-2xl shadow-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300">
+              <Link to={`/product/${product._id}`}  key={product._id} className="bg-dark-12 rounded-2xl shadow-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300">
                 <div className="aspect-square bg-dark-12 productSwiper">
                   {product.images.length > 0 ? (
                     <ProductSwiper
@@ -133,7 +133,8 @@ const Products = () => {
                   <p className="text-gray-400 my-2 line-clamp-3">{product.description}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-brown-60">
-                      {product.price ? `${product.price.toLocaleString()} сум` : 'Цена не указана'}
+                      165837230 so'm
+                      {/*{product.price ? `${product.price.toLocaleString()} сум` : 'Цена не указана'}*/}
                     </span>
                     <Link
                       to={`/product/${product._id}`}
@@ -143,7 +144,7 @@ const Products = () => {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

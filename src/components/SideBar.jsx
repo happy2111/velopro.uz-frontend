@@ -46,12 +46,14 @@ const SideBar = ({sidebarOpen, setSidebarOpen, sidebarItems, isAuthenticated, is
                   text={"Sign Up"}
                   isTransparent={false}
                   href={"/register"}
+                  onClick={() => setSidebarOpen(false)}
                 />
                 <Button
                   text={"Log In"}
                   isTransparent={false}
                   href={"/login"}
                   className={"!bg-brown-60"}
+                  onClick={() => setSidebarOpen(false)}
                 />
               </>
             )}

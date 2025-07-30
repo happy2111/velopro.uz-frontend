@@ -296,6 +296,22 @@ export const CartProvider = ({ children }) => {
     return state.items.reduce((total, item) => total + item.quantity, 0);
   };
 
+  const checkInCark = (id) => {
+    state.items.map(item => {
+      if (item._id === id) {
+        return true
+      }
+      else {
+        return false
+      }
+    })
+  }
+
+
+
+
+
+
   const value = {
     cartItems: state.items,
     loading: state.loading,
@@ -306,7 +322,8 @@ export const CartProvider = ({ children }) => {
     loadCart,
     syncCartWithServer,
     getCartTotal,
-    getCartItemsCount
+    getCartItemsCount,
+    checkInCark
   };
 
   return (

@@ -31,6 +31,7 @@ const AdminOrders = React.memo(({}) => {
 
       const response = await axiosInstance.get("/api/orders", {params});
       setFilteredProducts(response.data);
+      console.log("Fetched products:", response.data);
     } catch (err) {
       console.error("Error fetching products:", err);
     } finally {
@@ -156,38 +157,91 @@ const AdminOrders = React.memo(({}) => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-95">{user.title}</div>
+                              <div className="text-sm font-medium text-gray-95">{user.shippingAddress.firstName}
+                                <br /> {user.shippingAddress.lastName}</div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-95">{user.type}</div>
+                              <div className="text-sm font-medium text-gray-95">{
+                                user.products.map(product => (
+                                  <div key={product._id} className="mb-1">
+                                    {product.product.title} (x{product.quantity})
+                                  </div>
+                                ))
+                              }
+                              </div>
                             </div>
                           </div>
                         </td>
+                        {/*status: "pending"*/}
+                        {/*total: 62715.52*/}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-95">{user.total} so'm</div>
+                        </td>
+
+
+
+
+
+
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-95">{user.price} so'm</div>
+                              <div className="text-sm font-medium text-gray-95">{`
+                                ${user.shippingAddress.address},
+                                ${user.shippingAddress.city},
+                               ${user.shippingAddress.postalCode}`}
+                              </div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-95">{user.stock}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="ml-4 max-w-40">
-                              <div className="text-sm font-medium text-gray-95 truncate text-nowrap ">{user.description}</div>
-                            </div>
-                          </div>
-                        </td>
+                        {/*products: Array [ {…} ]*/}
+                        {/*​​​*/}
+                        {/*0: Object { product: {…}, quantity: 4, _id: "688244b95eec4c87e3852f31" }*/}
+                        {/*​​​​*/}
+                        {/*_id: "688244b95eec4c87e3852f31"*/}
+                        {/*​​​​*/}
+                        {/*product: Object { _id: "688108f23de43c22cedb6b47", title: "Scott Foil RC", brand: "Scott", … }*/}
+                        {/*​​​​​*/}
+                        {/*__v: 0*/}
+                        {/*​​​​​*/}
+                        {/*_id: "688108f23de43c22cedb6b47"*/}
+                        {/*​​​​​*/}
+                        {/*averageRating: 0*/}
+                        {/*​​​​​*/}
+                        {/*brand: "Scott"*/}
+                        {/*​​​​​*/}
+                        {/*createdAt: "2025-07-23T16:08:18.817Z"*/}
+                        {/*​​​​​*/}
+                        {/*description: "    FOIL Disc HMX Carbon Frame\r\n    FOIL Disc HMX Fork\r\n    Shimano Dura-Ace Di2 24 Speed\r\n    Syncros Capital 1.0 S Aero 60\r\n    Schwalbe PRO ONE Aero TL-Tires"*/}
+                        {/*​​​​​*/}
+                        {/*frameSize: "M,L,XL,XXL"*/}
+                        {/*​​​​​*/}
+                        {/*images: Array [ "/uploads/images-1753286898794-532157196.png", "/uploads/images-1753286898808-506012235.jpg" ]*/}
+                        {/*​​​​​*/}
+                        {/*isFeatured: false*/}
+                        {/*​​​​​*/}
+                        {/*price: 13999*/}
+                        {/*​​​​​*/}
+                        {/*reviews: Array []*/}
+                        {/*​​​​​*/}
+                        {/*stock: 4*/}
+                        {/*​​​​​*/}
+                        {/*title: "Scott Foil RC"*/}
+                        {/*​​​​​*/}
+                        {/*type: "шоссейный"*/}
+                        {/*​​​​​*/}
+                        {/*updatedAt: "2025-07-23T16:08:18.817Z"*/}
+                        {/*​​​​​*/}
+                        {/*wheelSize: "26', 27.5'"*/}
+                        {/*​​​​​*/}
+                        {/*<prototype>: Object { … }*/}
+                        {/*  ​​​​*/}
+                        {/*  quantity: 4*/}
+
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center space-x-2">
                             <Button
