@@ -7,9 +7,13 @@ import ShareButton from "../components/ShareButton.jsx";
 import Button from "../components/Button.jsx";
 import {ArrowLeftFromLineIcon} from "lucide-react";
 import toast from "react-hot-toast";
+import ProductReviewsSection from "../components/ProductReviewsSection.jsx";
+import {useAuth} from "../hooks/useAuth.jsx";
+import RelatedProductsSection from "../components/RelatedProductsSection.jsx";
 
 const ProductDetail = () => {
   const {id} = useParams();
+  const {user} = useAuth();
   const {addToCart} = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -221,7 +225,7 @@ const ProductDetail = () => {
               >
                 {addingToCart ? 'Добавление...' : !isAdded ? "Добавить" : "+1"}
               </button>
-              {isAdded ?
+              {isAdded &&
 
                 (
                   <Link
@@ -231,12 +235,14 @@ const ProductDetail = () => {
                     В Карзине
                     <span className={"opacity-75 text-base block"}>Перейти</span>
                   </Link>
-                ): (<button
-                  onClick={() => window.location.href = '/checkout'}
-                  className="flex-1 bg-dark-12 hover:bg-gray-700 border border-brown-60 duration-150 px-8 py-4 rounded-2xl text-lg font-bold transition-colors"
-                >
-                  Купить сейчас
-                </button>)}
+                )}
+
+              {/*<button*/}
+              {/*  onClick={() => window.location.href = '/checkout'}*/}
+              {/*  className="flex-1 bg-dark-12 hover:bg-gray-700 border border-brown-60 duration-150 px-8 py-4 rounded-2xl text-lg font-bold transition-colors"*/}
+              {/*>*/}
+              {/*  Купить сейчас*/}
+              {/*</button>*/}
 
 
 
@@ -271,6 +277,16 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+
+
+
+        {/*Review */}
+        <ProductReviewsSection
+          productId={id}
+          currentUser={user} // { id, name, role }
+        />
+
+        <RelatedProductsSection type={product.type} excludeId={product._id} />
       </div>
     </div>
   );

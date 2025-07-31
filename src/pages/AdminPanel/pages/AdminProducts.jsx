@@ -11,6 +11,10 @@ const AdminProducts = React.memo(({}) => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAddProductModal,setShowAddProductModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10; // Кол-во товаров на страницу
+
 
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
@@ -26,18 +30,23 @@ const AdminProducts = React.memo(({}) => {
     try {
       setLoading(true);
 
-      const params = {};
+      const params = {
+        page: currentPage,
+        limit,
+      };
       if (searchQuery) params.search = searchQuery;
       if (typeFilter) params.type = typeFilter;
 
-      const response = await axiosInstance.get("/api/products", {params});
-      setFilteredProducts(response.data);
+      const response = await axiosInstance.get("/api/products", { params });
+      setFilteredProducts(response.data.products);
+      setTotalPages(response.data.totalPages);
     } catch (err) {
       console.error("Error fetching products:", err);
     } finally {
       setLoading(false);
     }
   };
+
 
   const removeProduct = async (productId) => {
     try {
@@ -54,10 +63,10 @@ const AdminProducts = React.memo(({}) => {
     }
   }
 
-
   useEffect(() => {
     fetchProducts();
-  }, [searchQuery, typeFilter]);
+  }, [searchQuery, typeFilter, currentPage]);
+
 
   return (
     <div className="bg-dark-10 rounded-lg overflow-hidden shadow-sm max-md:w-[calc(100vw-50px)] box-border">
@@ -232,6 +241,25 @@ const AdminProducts = React.memo(({}) => {
           onClose={() => setShowAddProductModal(false)}
         />
       )}
+
+      {totalPages > 1 && (
+        <div className="p-6 flex justify-center gap-2 flex-wrap">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                currentPage === page
+                  ? 'bg-brown-60 text-white'
+                  : 'bg-dark-15 text-gray-400 hover:bg-dark-25'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+      )}
+
     </div>
   );
 });

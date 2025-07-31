@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import axiosInstance from '../utils/axiosInstance';
 import ProductSwiper from "../components/ProductSwiper.jsx";
 import {Link} from "react-router-dom";
+import Button from "../components/Button.jsx";
+import {Funnel} from "lucide-react"
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -9,16 +11,40 @@ const Products = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('name');
+  const [isFilterOpened, setIsFilterOpened] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [priceRange, setPriceRange] = useState({min: 0, max: 1000000});
+  const [selectedTypes, setSelectedTypes] = useState([]);
+  const limit = 18; // количество товаров на одной странице
+
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts(currentPage);
+  }, [searchTerm, currentPage, priceRange, selectedTypes]);
 
-  const fetchProducts = async () => {
+
+  const fetchProducts = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get('/api/products');
-      setProducts(response.data);
+
+      const params = {
+        page,
+        limit,
+        search: searchTerm,
+      };
+
+      if (selectedTypes.length > 0) {
+        params.type = selectedTypes.join(','); // multiple types support
+      }
+
+      if (priceRange.min !== undefined) params.min = priceRange.min;
+      if (priceRange.max !== undefined) params.max = priceRange.max;
+
+      const response = await axiosInstance.get("/api/products", {params});
+
+      setProducts(response.data.products);
+      setTotalPages(response.data.totalPages || 1);
     } catch (err) {
       setError('Ошибка загрузки товаров');
       console.error('Products fetch error:', err);
@@ -27,11 +53,14 @@ const Products = () => {
     }
   };
 
+
   const filteredProducts = products
-    .filter(product =>
-      product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter(product => (
+      (product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (product.price >= priceRange.min && product.price <= priceRange.max) &&
+      (selectedTypes.length === 0 || selectedTypes.includes(product.type))
+    ))
     .sort((a, b) => {
       switch (sortBy) {
         case 'price_low':
@@ -45,25 +74,14 @@ const Products = () => {
       }
     });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brown-60 mx-auto mb-4"></div>
-          <p className="text-xl">Загрузка товаров...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-red-600 mb-4">{error}</p>
+          <p className="text-xl text-brown-60 mb-4">{error}</p>
           <button
             onClick={fetchProducts}
-            className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-2xl transition-colors"
+            className="bg-brown-65 hover:bg-brown-60 px-6 py-3 rounded-2xl transition-colors"
           >
             Повторить попытку
           </button>
@@ -86,33 +104,101 @@ const Products = () => {
                 type="text"
                 placeholder="Поиск велосипедов..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // сбросить страницу при поиске
+                }}
                 className="w-full px-4 py-3 rounded-2xl bg-dark-10 text-[#f5f5f5] border border-gray-40 focus:border-brown-60 focus:outline-none"
               />
             </div>
             <div>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 rounded-2xl bg-dark-10 text-[#f5f5f5] border border-gray-40 focus:border-brown-60 focus:outline-none"
-              >
-                <option value="name">По названию</option>
-                <option value="price_low">Цена: по возрастанию</option>
-                <option value="price_high">Цена: по убыванию</option>
-              </select>
+              <Button
+                text={"Фильтры"}
+                CustomIconLeft={Funnel}
+                className={"gap-2"}
+                onClick={() => setIsFilterOpened(!isFilterOpened)}
+              />
             </div>
           </div>
+
+
+
+          {isFilterOpened && (
+            <div className="mt-4 p-6 bg-dark-12 rounded-2xl">
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-4">Цена</h3>
+                <div className="flex gap-4">
+                  <input
+                    type="number"
+                    placeholder="От"
+                    value={priceRange.min}
+                    onChange={(e) => setPriceRange(prev => ({
+                      ...prev,
+                      min: Number(e.target.value)
+                    }))}
+                    className="w-full px-4 py-2 rounded-xl bg-dark-10 border border-gray-40"
+                  />
+                  <input
+                    type="number"
+                    placeholder="До"
+                    value={priceRange.max}
+                    onChange={(e) => setPriceRange(prev => ({
+                      ...prev,
+                      max: Number(e.target.value)
+                    }))}
+                    className="w-full px-4 py-2 rounded-xl bg-dark-10 border border-gray-40"
+                  />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Тип велосипеда</h3>
+                <div className="flex flex-wrap gap-2">
+                  {['горный', 'шоссейный', 'городской', 'электро', 'детский'].map(type => (
+                    <button
+                      key={type}
+                      onClick={() => setSelectedTypes(prev =>
+                        prev.includes(type)
+                          ? prev.filter(t => t !== type)
+                          : [...prev, type]
+                      )}
+                      className={`px-4 py-2 rounded-xl border ${
+                        selectedTypes.includes(type)
+                          ? 'bg-brown-60 border-brown-60'
+                          : 'border-gray-40'
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+
         </div>
 
-        {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
+
+        {loading ? (
+            <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brown-60 mx-auto mb-4"></div>
+                <p className="text-xl">Загрузка товаров...</p>
+              </div>
+            </div>
+          ) : (
+          filteredProducts.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-xl text-gray-400">Товары не найдены</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map(product => (
-              <Link to={`/product/${product._id}`}  key={product._id} className="bg-dark-12 rounded-2xl shadow-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300">
+              <Link
+                to={`/product/${product._id}`}
+                key={product._id}
+                className="bg-dark-12  rounded-2xl shadow-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300"
+              >
                 <div className="aspect-square bg-dark-12 productSwiper">
                   {product.images.length > 0 ? (
                     <ProductSwiper
@@ -120,8 +206,12 @@ const Products = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <svg className="w-16 h-16 text-dark-25" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L3 7l9 5 9-5-9-5zM3 17l9 5 9-5M3 12l9 5 9-5"/>
+                      <svg
+                        className="w-16 h-16 text-dark-25"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 2L3 7l9 5 9-5-9-5zM3 17l9 5 9-5M3 12l9 5 9-5" />
                       </svg>
                     </div>
                   )}
@@ -131,14 +221,13 @@ const Products = () => {
                   <h3 className="text-xl font-bold mb-2 line-clamp-2">{product.title}</h3>
                   <span className="text-sm text-dark-12 bg-brown-70 px-2 py-1 text-[12px] font-semibold rounded-xl">{product.type}</span>
                   <p className="text-gray-400 my-2 line-clamp-3">{product.description}</p>
-                  <div className="flex items-center justify-between">
+                  <div className="flex justify-between flex-col">
                     <span className="text-2xl font-bold text-brown-60">
-                      165837230 so'm
-                      {/*{product.price ? `${product.price.toLocaleString()} сум` : 'Цена не указана'}*/}
+                      {product.price.toLocaleString()} so'm
                     </span>
                     <Link
                       to={`/product/${product._id}`}
-                      className="bg-brown-60 hover:bg-brown-70 px-4 py-2 rounded-xl duration-150 transition-colors"
+                      className="bg-brown-60 hover:bg-brown-70 w-full text-center mt-3 px-4 py-2 rounded-xl duration-150 transition-colors"
                     >
                       Подробнее
                     </Link>
@@ -147,10 +236,34 @@ const Products = () => {
               </Link>
             ))}
           </div>
+        )
+        )
+        }
+
+        {totalPages > 1 && (
+          <div className="p-6 flex justify-center gap-2 flex-wrap">
+            {Array.from({length: totalPages}, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  currentPage === page
+                    ? 'bg-brown-60 text-white'
+                    : 'bg-dark-15 text-gray-400 hover:bg-dark-25'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
         )}
+
       </div>
     </div>
   );
 };
 
 export default Products;
+
+
+
