@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import axiosInstance from "../../../utils/axiosInstance.js";
 import Button from "../../../components/Button.jsx";
+import {useAdminData} from "../../../context/AdminDataContext.jsx";
 
 export default function AddProductModal({ isOpen, onClose, onProductCreated }) {
   const [form, setForm] = useState({
@@ -9,6 +10,7 @@ export default function AddProductModal({ isOpen, onClose, onProductCreated }) {
     brand: "",
     description: "",
     type: "",
+    category: "",
     price: "",
     stock: "",
     frameSize: "",
@@ -20,6 +22,8 @@ export default function AddProductModal({ isOpen, onClose, onProductCreated }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const {createProduct} = useAdminData()
+
 
   const bikeTypes = [
     { value: "горный", label: "Горный" },
@@ -28,9 +32,14 @@ export default function AddProductModal({ isOpen, onClose, onProductCreated }) {
     { value: "электро", label: "Электро" },
     { value: "детский", label: "Детский" },
   ];
+  const categories = [
+    { value: "bike", label: "bike" },
+    { value: "part", label: "part" },
+    { value: "accessory", label: "accessory" },
+  ];
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type, checked, category } = e.target;
     setForm({
       ...form,
       [name]: type === 'checkbox' ? checked : value
@@ -67,11 +76,7 @@ export default function AddProductModal({ isOpen, onClose, onProductCreated }) {
         formData.append('images', image);
       });
 
-      const res = await axiosInstance.post('/api/products', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const res = await createProduct(formData)
 
       setSuccess("Продукт успешно создан!");
       setForm({
@@ -149,10 +154,29 @@ export default function AddProductModal({ isOpen, onClose, onProductCreated }) {
               onChange={handleChange}
               required
             >
-              <option value="">Выберите тип</option>
+              <option value="" hidden>Выберите тип</option>
               {bikeTypes.map(type => (
                 <option key={type.value} value={type.value}>
                   {type.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-gray-95 text-sm font-bold mb-1">
+              Категория <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="category"
+              className="w-full border text-gray-95 bg-dark-20 border-gray-40 px-3 py-2 rounded focus:border-brown-60 outline-none"
+              value={form.category}
+              onChange={handleChange}
+              required
+            >
+              <option value="" hidden>Выберите категорию</option>
+              {categories.map(cat => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
                 </option>
               ))}
             </select>
@@ -292,7 +316,7 @@ export default function AddProductModal({ isOpen, onClose, onProductCreated }) {
           </div>
         </form>
       </div>
-      <div className="absolute inset-0 z-10 bg-dark-06/70" onClick={onClose}></div>
+      <div className="absolute inset-0 z-10 backdrop-blur-sm bg-dark-06/70" onClick={onClose}></div>
     </div>
   );
 }

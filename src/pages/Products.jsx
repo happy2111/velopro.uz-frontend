@@ -16,12 +16,13 @@ const Products = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [priceRange, setPriceRange] = useState({min: 0, max: 1000000});
   const [selectedTypes, setSelectedTypes] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState([]);
   const limit = 18; // количество товаров на одной странице
 
 
   useEffect(() => {
     fetchProducts(currentPage);
-  }, [searchTerm, currentPage, priceRange, selectedTypes]);
+  }, [searchTerm, currentPage, priceRange, selectedTypes, selectedCategory]);
 
 
   const fetchProducts = async (page = 1) => {
@@ -36,6 +37,9 @@ const Products = () => {
 
       if (selectedTypes.length > 0) {
         params.type = selectedTypes.join(','); // multiple types support
+      }
+      if (selectedCategory.length > 0) {
+        params.category = selectedCategory.join(',');
       }
 
       if (priceRange.min !== undefined) params.min = priceRange.min;
@@ -59,7 +63,8 @@ const Products = () => {
       (product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (product.price >= priceRange.min && product.price <= priceRange.max) &&
-      (selectedTypes.length === 0 || selectedTypes.includes(product.type))
+      (selectedTypes.length === 0 || selectedTypes.includes(product.type)) &&
+      (selectedCategory.length === 0 || selectedCategory.includes(product.category))
     ))
     .sort((a, b) => {
       switch (sortBy) {
@@ -151,6 +156,28 @@ const Products = () => {
                 </div>
               </div>
               <div>
+                <h3 className="text-lg font-semibold mb-4">Категория</h3>
+                <div className="flex flex-wrap gap-2">
+                  {['bike', 'part', 'accessory' ].map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(prev =>
+                        prev.includes(cat)
+                          ? prev.filter(t => t !== cat)
+                          : [...prev, cat]
+                      )}
+                      className={`px-4 py-2 rounded-xl border ${
+                        selectedCategory.includes(cat)
+                          ? 'bg-brown-60 border-brown-60'
+                          : 'border-gray-40'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
                 <h3 className="text-lg font-semibold mb-4">Тип велосипеда</h3>
                 <div className="flex flex-wrap gap-2">
                   {['горный', 'шоссейный', 'городской', 'электро', 'детский'].map(type => (
@@ -174,8 +201,6 @@ const Products = () => {
               </div>
             </div>
           )}
-
-
         </div>
 
 
@@ -217,11 +242,11 @@ const Products = () => {
                   )}
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 ">
                   <h3 className="text-xl font-bold mb-2 line-clamp-2">{product.title}</h3>
                   <span className="text-sm text-dark-12 bg-brown-70 px-2 py-1 text-[12px] font-semibold rounded-xl">{product.type}</span>
-                  <p className="text-gray-400 my-2 line-clamp-3">{product.description}</p>
-                  <div className="flex justify-between flex-col">
+                  <p className="text-gray-400 my-2 line-clamp-2">{product.description} <br/><br/></p>
+                  <div className="flex justify-between flex-col !mt-full">
                     <span className="text-2xl font-bold text-brown-60">
                       {product.price.toLocaleString()} so'm
                     </span>

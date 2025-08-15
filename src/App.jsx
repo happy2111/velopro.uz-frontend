@@ -21,6 +21,8 @@ import AdminProducts from "./pages/AdminPanel/pages/AdminProducts.jsx";
 import AdminUsers from "./pages/AdminPanel/pages/AdminUsers.jsx";
 import AdminOrders from "./pages/AdminPanel/pages/AdminOrders.jsx";
 import {Toaster} from "react-hot-toast";
+import {AdminDataProvider} from "./context/AdminDataContext.jsx";
+import UsersDetail from "./pages/AdminPanel/pages/UsersDetail.jsx";
 
 function App() {
   return (
@@ -81,7 +83,9 @@ function App() {
                   path="/admin"
                   element={
                     <ProtectedRoute requireAuth={true} requireRole="admin">
-                      <AdminLayout />
+                      <AdminDataProvider>
+                        <AdminLayout />
+                      </AdminDataProvider>
                     </ProtectedRoute>
                   }
                 >
@@ -91,6 +95,7 @@ function App() {
                   <Route path="users" element={<AdminUsers/>} />
                   <Route path="orders" element={<AdminOrders/>} />
                   <Route path="*" element={<NotFound />} />
+                  <Route path="users/:id" element={<UsersDetail/>}/>
                 </Route>
 
               </Routes>

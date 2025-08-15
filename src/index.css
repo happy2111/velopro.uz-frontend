@@ -93,14 +93,28 @@ body {
   /*--color-brown-97: #EEEDEB;*/
   /*--color-brown-99: #EFEFEE;*/
 
-  --color-brown-60: #D66A5D;
-  --color-brown-65: #DD786B;
-  --color-brown-70: #E38579;
-  --color-brown-80: #EDA097;
-  --color-brown-90: #F4C2BA;
-  --color-brown-95: #F9D7D2;
-  --color-brown-97: #FBE3DF;
-  --color-brown-99: #FDF0EE;
+  /*--color-brown-60: #8D1C1F;*/
+  /*--color-brown-65: #8D1C1F;*/
+  /*--color-brown-70: #8D1C1F;*/
+
+
+  --color-brown-60: #C33636;  /* Основной насыщенный красный */
+  --color-brown-65: #CC4343;  /* Немного ярче */
+  --color-brown-70: #D65252;  /* Мягкий акцент */
+  --color-brown-80: #E07474;  /* Светлый красный */
+  --color-brown-90: #ED9C9C;  /* Очень светлый акцент */
+  --color-brown-95: #F2BABA;  /* Для подложек, ховеров */
+  --color-brown-97: #F8D2D2;  /* Почти пастельный */
+  --color-brown-99: #FCEBEB;  /* Для фоновых элементов */
+
+
+  /*--color-brown-60: #D66A5D;*/
+  /*--color-brown-65: #DD786B;*/
+  /*--color-brown-70: #E38579;*/
+  /*--color-brown-90: #F4C2BA;*/
+  /*--color-brown-95: #F9D7D2;*/
+  /*--color-brown-97: #FBE3DF;*/
+  /*--color-brown-99: #FDF0EE;*/
 
 }
 @theme {

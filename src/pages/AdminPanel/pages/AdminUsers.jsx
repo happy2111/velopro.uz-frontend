@@ -1,10 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {Search, RefreshCw, Trash2, Plus, Loader2, Edit} from 'lucide-react';
+import {Search, RefreshCw, Trash2, Plus, Loader2, Edit, Info} from 'lucide-react';
 import Button from "../../../components/Button.jsx";
 import axiosInstance from "../../../utils/axiosInstance.js";
+import {useAdminData} from "../../../context/AdminDataContext.jsx";
+import {Link, useNavigate} from "react-router-dom";
 
 
-const AdminUsers = React.memo(({}) => {
+const AdminUsers = (({}) => {
+  const {users} = useAdminData()
 
 
   const [showAddUserModal, setShowAddUserModal] = useState(false);
@@ -28,7 +31,6 @@ const AdminUsers = React.memo(({}) => {
       const params = {};
       if (searchQuery) params.search = searchQuery;
       if (typeFilter) params.role = typeFilter;
-
       const response = await axiosInstance.get("/api/users", {params});
       setFilteredProducts(response.data);
     } catch (err) {
@@ -57,7 +59,7 @@ const AdminUsers = React.memo(({}) => {
   useEffect(() => {
     fetchProducts();
   }, [searchQuery, typeFilter]);
-
+  const navigate = useNavigate()
   return (
     <div className="bg-dark-10 rounded-lg overflow-hidden shadow-sm max-md:w-[calc(100vw-50px)] box-border">
       <div className="p-6 box-border border-gray-200">
@@ -122,77 +124,83 @@ const AdminUsers = React.memo(({}) => {
 
         (
           <>
-            {filteredProducts.length > 0 && (
+            {users.length > 0 && (
               <div className="overflow-x-scroll">
                 <table className="min-w-full divide-y divide-dark-25">
                   <thead className="bg-dark-15">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Username</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Phone</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider max-md:hidden">Phone</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider max-md:hidden">Email</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Role</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-dark-10  divide-y divide-dark-25">
-                    {filteredProducts.map((user) => (
+                    {users.map((user) => (
                       <tr
                         key={user._id || user.id}
                         className="hover:bg-dark-15"
+                        onClick={() => navigate(`/admin/users/${user._id}`)}
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-95">{user.username}</div>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-95">{user.username}</div>
+                                <div className="text-sm font-medium md:hidden text-gray-70">{user.email}</div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-95">{user.phone}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap max-md:hidden">
+                            <div className="flex items-center">
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-95">{user.phone}</div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-95">{user.email} so'm</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap max-md:hidden">
+                            <div className="flex items-center">
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-95">{user.email}</div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-95">{user.role}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-95">{user.role}</div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              isTransparent={false}
-                              CustomIcon={Trash2}
-                              onClick={() => {
-                                console.log(`Deleting product with ID: ${user._id}`);
-                                if (window.confirm(`Are you sure you want to delete product with ID: ${user._id}?`)) {
-                                  removeProduct(user._id);
-                                }
-                              }
-                              }
-                              className="!bg-red-600"
-                            />
-                            <Button
-                              isTransparent={false}
-                              CustomIcon={Edit}
-                              onClick={() => {
-                                console.log(`Editing product with ID: ${user._id}`);
-                              }}
-                              className="!bg-yellow-600"
-                            />
-                          </div>
-                        </td>
-
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                className="!text-sky-600 !p-5 !border-sky-600 active:scale-105  "
+                              >
+                                <Info/>
+                              </button>
+                              {/*<Button*/}
+                              {/*  isTransparent={false}*/}
+                              {/*  CustomIcon={Trash2}*/}
+                              {/*  onClick={() => {*/}
+                              {/*    console.log(`Deleting product with ID: ${user._id}`);*/}
+                              {/*    if (window.confirm(`Are you sure you want to delete product with ID: ${user._id}?`)) {*/}
+                              {/*      removeProduct(user._id);*/}
+                              {/*    }*/}
+                              {/*  }*/}
+                              {/*  }*/}
+                              {/*  className="!bg-red-600"*/}
+                              {/*/>*/}
+                              {/*<Button*/}
+                              {/*  isTransparent={false}*/}
+                              {/*  CustomIcon={Edit}*/}
+                              {/*  onClick={() => {*/}
+                              {/*    console.log(`Editing product with ID: ${user._id}`);*/}
+                              {/*  }}*/}
+                              {/*  className="!bg-yellow-600"*/}
+                              {/*/>*/}
+                            </div>
+                          </td>
                       </tr>
                     ))}
                   </tbody>

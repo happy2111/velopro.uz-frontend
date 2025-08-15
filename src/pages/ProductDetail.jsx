@@ -138,6 +138,10 @@ const ProductDetail = () => {
                 <span className={"opacity-55 text-base font-semibold text-gray-300"}>Type:</span>{"  "}
                 <span className="text-sm text-dark-12 bg-brown-70 px-2 py-1 text-[12px] font-semibold rounded-xl">{product.type}</span>
               </p>
+              <p className="my-2">
+                <span className={"opacity-55 text-base font-semibold text-gray-300"}>Category:</span>{"  "}
+                <span className="text-sm text-dark-12 bg-brown-70 px-2 py-1 text-[12px] font-semibold rounded-xl">{product?.category}</span>
+              </p>
               <p className="text-gray-400 text-lg leading-relaxed">{product.description}</p>
             </div>
 
@@ -237,14 +241,6 @@ const ProductDetail = () => {
                   </Link>
                 )}
 
-              {/*<button*/}
-              {/*  onClick={() => window.location.href = '/checkout'}*/}
-              {/*  className="flex-1 bg-dark-12 hover:bg-gray-700 border border-brown-60 duration-150 px-8 py-4 rounded-2xl text-lg font-bold transition-colors"*/}
-              {/*>*/}
-              {/*  Купить сейчас*/}
-              {/*</button>*/}
-
-
 
 
             </div>
@@ -285,6 +281,7 @@ const ProductDetail = () => {
           productId={id}
           currentUser={user} // { id, name, role }
         />
+
 
         <RelatedProductsSection type={product.type} excludeId={product._id} />
       </div>

@@ -1,19 +1,28 @@
 import React, {useEffect, useState} from 'react';
-import {Search, RefreshCw, Trash2, Plus, Loader2, Edit} from 'lucide-react';
+import {Search, RefreshCw, Trash2, Plus, Loader2, Edit, Info} from 'lucide-react';
 import Button from "../../../components/Button.jsx";
 import axiosInstance from "../../../utils/axiosInstance.js";
 import AddProductModal from "../components/AddProductModal.jsx";
+import InfoModal from "../components/InfoModal.jsx";
+import {useAdminData} from "../../../context/AdminDataContext.jsx";
 
 
 const AdminProducts = React.memo(({}) => {
 
-
+  const {users, products, orders} = useAdminData()
+  useEffect(() => {
+    console.log("Users:", users);
+    console.log("Products:", products);
+    console.log("Orders:", orders)
+  }, [])
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAddProductModal,setShowAddProductModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isInfoModalOpened, setIsInfoModalOpened] = useState(false)
   const limit = 10; // Кол-во товаров на страницу
+  const [infoModalData, setInfoModalData] = useState([])
 
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,6 +160,7 @@ const AdminProducts = React.memo(({}) => {
                 <table className="min-w-full divide-y divide-dark-25">
                   <thead className="bg-dark-15">
                     <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Image</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Title</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Type</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Price</th>
@@ -165,6 +175,23 @@ const AdminProducts = React.memo(({}) => {
                         key={user._id || user.id}
                         className="hover:bg-dark-15"
                       >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="ml-4">
+
+                              <div className="h-12 w-12 overflow-hidden rounded-xl text-sm font-medium text-gray-95">
+                                <img
+                                  className={"object-cover w-full h-full"}
+                                  src={`${import.meta.env.VITE_API_BASE_URL}${user?.images[0]}`}
+                                  alt=""
+                                  width=""
+                                  height=""
+                                  loading="lazy"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="ml-4">
@@ -221,6 +248,15 @@ const AdminProducts = React.memo(({}) => {
                               }}
                               className="!bg-yellow-600"
                             />
+                            <Button
+                              isTransparent={false}
+                              CustomIcon={Info}
+                              onClick={() => {
+                                setInfoModalData(user);
+                                setIsInfoModalOpened(true);
+                              }}
+                              className="!bg-sky-600"
+                            />
                           </div>
                         </td>
 
@@ -259,6 +295,17 @@ const AdminProducts = React.memo(({}) => {
           ))}
         </div>
       )}
+
+      {
+        isInfoModalOpened && (<InfoModal
+          isOpen={isInfoModalOpened}
+          onClose={() => setIsInfoModalOpened(false)}
+          title="Информация о продукте"
+          data={infoModalData}
+          editableFields={['title', 'price', 'category', 'description']}
+          // onSave={(updatedData) => updateProductInBackend(updatedData)}
+        />)
+      }
 
     </div>
   );
