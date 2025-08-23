@@ -4,6 +4,7 @@ import Button from "../../../components/Button.jsx";
 import axiosInstance from "../../../utils/axiosInstance.js";
 import {useAdminData} from "../../../context/AdminDataContext.jsx";
 import {Link, useNavigate} from "react-router-dom";
+import AddUserModal from "../components/AddUserModal.jsx";
 
 
 const AdminUsers = (({}) => {
@@ -64,7 +65,6 @@ const AdminUsers = (({}) => {
     <div className="bg-dark-10 rounded-lg overflow-hidden shadow-sm max-md:w-[calc(100vw-50px)] box-border">
       <div className="p-6 box-border border-gray-200">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h2 className="text-xl font-semibold text-white mb-2 md:mb-0">Ro‘yxatdan o‘tgan foydalanuvchilar</h2>
           <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-3 w-full md:w-auto">
             <Button
               text={"Qo‘shish"}
@@ -87,7 +87,7 @@ const AdminUsers = (({}) => {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 border text-gray-95 bg-dark-15 border-dark-25 rounded-lg focus:ring-2 focus:ring-brown-60 focus:border-transparent w-full md:w-auto"
+              className="px-5 h-[49px]  text-gray-95 bg-dark-15  rounded-lg focus:ring-2 focus:ring-brown-60 focus:border-transparent w-full md:w-auto"
             >
               <option
                 className={"capitalize"}
@@ -104,9 +104,6 @@ const AdminUsers = (({}) => {
                 value="user"
               >User
               </option>
-
-
-
             </select>
             <Button
               text={"Yangilash"}
@@ -132,7 +129,7 @@ const AdminUsers = (({}) => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Username</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider max-md:hidden">Phone</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider max-md:hidden">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Role</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider max-sm:hidden">Role</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-80 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
@@ -145,6 +142,9 @@ const AdminUsers = (({}) => {
                       >
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
+                              <div className="h-10 w-10 bg-dark-25 rounded-full flex items-center justify-center text-gray-70">
+                                {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
+                              </div>
                               <div className="ml-4">
                                 <div className="text-sm font-medium text-gray-95">{user.username}</div>
                                 <div className="text-sm font-medium md:hidden text-gray-70">{user.email}</div>
@@ -165,7 +165,7 @@ const AdminUsers = (({}) => {
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-4 whitespace-nowrap max-sm:hidden">
                             <div className="flex items-center">
                               <div className="ml-4">
                                 <div className="text-sm font-medium text-gray-95">{user.role}</div>
@@ -174,31 +174,11 @@ const AdminUsers = (({}) => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center space-x-2">
-                              <button
-                                className="!text-sky-600 !p-5 !border-sky-600 active:scale-105  "
-                              >
-                                <Info/>
-                              </button>
-                              {/*<Button*/}
-                              {/*  isTransparent={false}*/}
-                              {/*  CustomIcon={Trash2}*/}
-                              {/*  onClick={() => {*/}
-                              {/*    console.log(`Deleting product with ID: ${user._id}`);*/}
-                              {/*    if (window.confirm(`Are you sure you want to delete product with ID: ${user._id}?`)) {*/}
-                              {/*      removeProduct(user._id);*/}
-                              {/*    }*/}
-                              {/*  }*/}
-                              {/*  }*/}
-                              {/*  className="!bg-red-600"*/}
-                              {/*/>*/}
-                              {/*<Button*/}
-                              {/*  isTransparent={false}*/}
-                              {/*  CustomIcon={Edit}*/}
-                              {/*  onClick={() => {*/}
-                              {/*    console.log(`Editing product with ID: ${user._id}`);*/}
-                              {/*  }}*/}
-                              {/*  className="!bg-yellow-600"*/}
-                              {/*/>*/}
+                              <Button
+                                isTransparent={false}
+                                CustomIcon={Info}
+                                className="!bg-sky-900"
+                              />
                             </div>
                           </td>
                       </tr>
@@ -211,6 +191,9 @@ const AdminUsers = (({}) => {
           </>
         )
       }
+
+      {/*-------------------------------------------*/}
+      <AddUserModal onClose={() => setShowAddUserModal(false)} isOpen={showAddUserModal} onAddUser={() => fetchProducts()}/>
     </div>
   );
 });

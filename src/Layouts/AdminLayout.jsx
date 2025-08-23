@@ -1,14 +1,19 @@
-import React, {useState} from 'react';
-import {Outlet, Link, useLocation, useNavigate} from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {
+  Outlet,
+  Link,
+  useLocation,
+  useNavigate,
+  useParams
+} from 'react-router-dom';
 import {useAuth} from '../context/AuthContext';
 import SideBar from "../components/SideBar.jsx";
 import Button from "../components/Button.jsx";
 import {Menu, ShoppingCart, User} from "lucide-react";
 
 const AdminLayout = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const {user, isAuthenticated, logout} = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -44,6 +49,17 @@ const AdminLayout = () => {
     },
   ];
 
+  const loc = [
+    // {text: "Home", href: "/admin"},
+    {text: "Products", href: "/admin/products"},
+    {text: "Users", href: "/admin/users"},
+    {text: "Orders", href: "/admin/orders"},
+    {text: "Settings", href: "/admin/settings"},
+  ]
+
+  const {pathname} = useLocation()
+
+
 
   return (
     <div className="flex h-screen bg-[#0d0d0d]">
@@ -58,11 +74,11 @@ const AdminLayout = () => {
         />
       </div>
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden overflow-x-hidden overflow-y-auto">
         {/* Top bar */}
-        <nav className="bg-dark-06 h-[123px] flex items-center sticky top-0 z-50 border-b-2 border-dark-15  border-dashed ">
-          <div className=" min-w-full h-[90px] flex items-center rounded-3xl ">
-            <div className="flex items-center border-x-2 border-dark-15  border-dashed w-full justify-between h-full p-4">
+        <nav className="bg-dark-06/50 backdrop-blur-2xl flex items-center sticky top-0 z-50 border-b-2 border-dark-15  border-dashed max-sm:border-transparent ">
+          <div className=" min-w-full h-[80px] flex items-center rounded-3xl ">
+            <div className="flex items-center border-x-2 border-dark-15  border-dashed max-sm:!border-none w-full justify-between h-full p-4">
               <div className="flex items-center space-x-4">
                 <Button
                   text={""}
@@ -71,7 +87,12 @@ const AdminLayout = () => {
                   onClick={() => setSidebarOpen(!sidebarOpen)}
                   className={"lg:hidden"}
                 />
-                <Link to={"/admin"} className="text-2xl font-bold text-white">Admin Panel</Link>
+                <Link
+                  to={"/admin"}
+                  className="text-2xl font-bold text-white bg-dark-12 flex items-center h-[49px] px-3 rounded-lg"
+                >
+                  {`${loc.find(l => pathname.includes(l.href))?.text || "Admin"}`}
+                </Link>
               </div>
             </div>
           </div>
@@ -79,13 +100,8 @@ const AdminLayout = () => {
         </nav>
 
 
-
-
-
-
-
         {/* Content area */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#0d0d0d] p-6">
+        <main className="flex-1  bg-[#0d0d0d] p-6">
           <Outlet />
         </main>
       </div>

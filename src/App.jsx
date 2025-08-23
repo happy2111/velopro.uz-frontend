@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Routes, Route, Link, Navigate} from 'react-router-dom';
+import {Routes, Route, Link, Navigate, Outlet} from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -84,17 +84,21 @@ function App() {
                   element={
                     <ProtectedRoute requireAuth={true} requireRole="admin">
                       <AdminDataProvider>
-                        <AdminLayout />
+                        <Outlet />
+                        {/*<AdminLayout />*/}
                       </AdminDataProvider>
                     </ProtectedRoute>
                   }
                 >
-                  <Route path="" element={<Navigate to="products" replace />} />
-                  <Route path={"profile"} element={<Profile/>}/>
-                  <Route path="products" element={<AdminProducts />} />
-                  <Route path="users" element={<AdminUsers/>} />
-                  <Route path="orders" element={<AdminOrders/>} />
-                  <Route path="*" element={<NotFound />} />
+                  <Route path="" element={<AdminLayout/>}>
+                    <Route path="" element={<Navigate to="products" replace />} />
+                    <Route path={"profile"} element={<Profile/>}/>
+                    <Route path="products" element={<AdminProducts />} />
+                    <Route path="users" element={<AdminUsers/>} />
+                    <Route path="orders" element={<AdminOrders/>} />
+                    <Route path="*" element={<NotFound />} />
+                  </Route>
+
                   <Route path="users/:id" element={<UsersDetail/>}/>
                 </Route>
 

@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import {ArrowLeft, Edit2, X, Star, Phone, Mail, MapPin} from "lucide-react"
 import ConfirmModal from "../../../components/ConfirmModal.jsx";
 import toast from "react-hot-toast";
+import UserDetailSkeleton from "../components/UserDetailSkeleton.jsx";
 
 const UsersDetail = ({refreshData}) => {
   const {id} = useParams()
@@ -127,12 +128,7 @@ const UsersDetail = ({refreshData}) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brown-60 mx-auto mb-4"></div>
-          <p className="text-xl">Loading Customer Info...</p>
-        </div>
-      </div>
+     <UserDetailSkeleton />
     );
   }
   return (
@@ -144,7 +140,7 @@ const UsersDetail = ({refreshData}) => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => navigte(-1)}
-                className="bg-dark-10 rounded-2xl px-6 py-3 flex items-center text-gray-400 hover:text-white transition-colors"
+                className="bg-dark-10 rounded-2xl px-6 py-3 flex items-center text-dark-35 hover:text-white transition-colors"
               >
                 <ArrowLeft
                   size={20}
@@ -158,7 +154,7 @@ const UsersDetail = ({refreshData}) => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 pt-2">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Customer Details */}
           <div className="lg:col-span-2 space-y-6">

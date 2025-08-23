@@ -63,7 +63,6 @@ const AdminOrders = React.memo(({}) => {
     <div className="bg-dark-10 rounded-lg overflow-hidden shadow-sm max-md:w-[calc(100vw-50px)] box-border">
       <div className="p-6 box-border border-gray-200">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h2 className="text-xl font-semibold text-white mb-2 md:mb-0">Orders</h2>
           <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-3 w-full md:w-auto">
             <Button
               text={"Qo‘shish"}
@@ -83,42 +82,42 @@ const AdminOrders = React.memo(({}) => {
               />
 
             </div>
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 border text-gray-95 bg-dark-15 border-dark-25 rounded-lg focus:ring-2 focus:ring-brown-60 focus:border-transparent w-full md:w-auto"
-            >
-              <option
-                className={"capitalize"}
-                value=""
-              >Barchasi
-              </option>
-              <option
-                className={"capitalize"}
-                value="горный"
-              >горный
-              </option>
-              <option
-                className={"capitalize"}
-                value="шоссейный"
-              >шоссейный
-              </option>
-              <option
-                className={"capitalize"}
-                value="городской"
-              >городской
-              </option>
-              <option
-                className={"capitalize"}
-                value="городской"
-              >городской
-              </option>
-              <option
-                className={"capitalize"}
-                value="детский"
-              >детский
-              </option>
-            </select>
+            {/*<select*/}
+            {/*  value={typeFilter}*/}
+            {/*  onChange={(e) => setTypeFilter(e.target.value)}*/}
+            {/*  className="px-3 py-2 h-[49px] text-gray-95 bg-dark-15  rounded-lg focus:ring-2 focus:ring-brown-60 focus:border-transparent w-full md:w-auto"*/}
+            {/*>*/}
+            {/*  <option*/}
+            {/*    className={"capitalize"}*/}
+            {/*    value=""*/}
+            {/*  >Barchasi*/}
+            {/*  </option>*/}
+            {/*  <option*/}
+            {/*    className={"capitalize"}*/}
+            {/*    value="горный"*/}
+            {/*  >горный*/}
+            {/*  </option>*/}
+            {/*  <option*/}
+            {/*    className={"capitalize"}*/}
+            {/*    value="шоссейный"*/}
+            {/*  >шоссейный*/}
+            {/*  </option>*/}
+            {/*  <option*/}
+            {/*    className={"capitalize"}*/}
+            {/*    value="городской"*/}
+            {/*  >городской*/}
+            {/*  </option>*/}
+            {/*  <option*/}
+            {/*    className={"capitalize"}*/}
+            {/*    value="городской"*/}
+            {/*  >городской*/}
+            {/*  </option>*/}
+            {/*  <option*/}
+            {/*    className={"capitalize"}*/}
+            {/*    value="детский"*/}
+            {/*  >детский*/}
+            {/*  </option>*/}
+            {/*</select>*/}
             <Button
               text={"Yangilash"}
               isTransparent={false}
