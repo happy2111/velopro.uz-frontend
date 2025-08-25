@@ -24,6 +24,7 @@ const UsersDetail = ({refreshData}) => {
     } catch (err) {
       console.log(err)
     } finally {
+      await new Promise((resolve) => setTimeout(resolve, 300));
       setLoading(false)
     }
   }
@@ -125,6 +126,8 @@ const UsersDetail = ({refreshData}) => {
       handleAddTag();
     }
   };
+
+
 
   if (loading) {
     return (

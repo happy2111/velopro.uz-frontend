@@ -8,7 +8,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Products from './pages/Products';
-import ProductDetail from './pages/ProductDetail';
+import AdminProductDetail from './pages/AdminPanel/pages/AdminProductDetail.jsx';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -23,6 +23,7 @@ import AdminOrders from "./pages/AdminPanel/pages/AdminOrders.jsx";
 import {Toaster} from "react-hot-toast";
 import {AdminDataProvider} from "./context/AdminDataContext.jsx";
 import UsersDetail from "./pages/AdminPanel/pages/UsersDetail.jsx";
+import ProductDetail from "./pages/ProductDetail.jsx";
 
 function App() {
   return (
@@ -100,6 +101,8 @@ function App() {
                   </Route>
 
                   <Route path="users/:id" element={<UsersDetail/>}/>
+                  <Route path="product/:id" element={<AdminProductDetail/>}/>
+
                 </Route>
 
               </Routes>

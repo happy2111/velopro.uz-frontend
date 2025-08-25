@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import axiosInstance from '../utils/axiosInstance';
 import ProductSwiper from "../components/ProductSwiper.jsx";
-import {Link} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import Button from "../components/Button.jsx";
 import {Funnel} from "lucide-react"
 
@@ -18,6 +18,22 @@ const Products = () => {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const limit = 18; // количество товаров на одной странице
+  const navigate = useNavigate()
+  const {pathname, hash} = useLocation()
+  const location = useLocation();
+
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const categoryParam = params.get('category');
+
+    if (categoryParam) {
+      const categories = categoryParam.split(',');
+      setSelectedCategory(categories);
+    } else {
+      setSelectedCategory([]);
+    }
+  }, [location.search]); // будет вызываться при изменении URL
 
 
   useEffect(() => {
@@ -41,9 +57,8 @@ const Products = () => {
       if (selectedCategory.length > 0) {
         params.category = selectedCategory.join(',');
       }
-
-      if (priceRange.min !== undefined) params.min = priceRange.min;
-      if (priceRange.max !== undefined) params.max = priceRange.max;
+      if (priceRange.min !== undefined && priceRange.min !== null) params.min = priceRange.min;
+      if (priceRange.max !== undefined && priceRange.max !== null) params.max = priceRange.max;
 
       const response = await axiosInstance.get("/api/products", {params});
 
@@ -60,11 +75,8 @@ const Products = () => {
 
   const filteredProducts = products
     .filter(product => (
-      (product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (product.price >= priceRange.min && product.price <= priceRange.max) &&
-      (selectedTypes.length === 0 || selectedTypes.includes(product.type)) &&
-      (selectedCategory.length === 0 || selectedCategory.includes(product.category))
+      product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchTerm.toLowerCase())
     ))
     .sort((a, b) => {
       switch (sortBy) {
@@ -78,6 +90,7 @@ const Products = () => {
           return 0;
       }
     });
+
 
   if (error) {
     return (
@@ -121,7 +134,9 @@ const Products = () => {
                 text={"Фильтры"}
                 CustomIconLeft={Funnel}
                 className={"gap-2"}
-                onClick={() => setIsFilterOpened(!isFilterOpened)}
+                onClick={() => {
+                  setIsFilterOpened(!isFilterOpened);
+                }}
               />
             </div>
           </div>
@@ -161,11 +176,23 @@ const Products = () => {
                   {['bike', 'part', 'accessory' ].map(cat => (
                     <button
                       key={cat}
-                      onClick={() => setSelectedCategory(prev =>
-                        prev.includes(cat)
-                          ? prev.filter(t => t !== cat)
-                          : [...prev, cat]
-                      )}
+                      onClick={() => {
+                        // Вычисляем, какие категории будут после клика
+                        const newSelected = selectedCategory.includes(cat)
+                          ? selectedCategory.filter(t => t !== cat)
+                          : [...selectedCategory, cat];
+
+                        // Формируем query string
+                        const query = newSelected.length > 0
+                          ? `category=${newSelected.join(',')}`
+                          : "";
+
+                        // Навигация с новым query
+                        navigate(`${pathname}${query ? `?${query}` : ''}`);
+
+                        // Обновляем state
+                        setSelectedCategory(newSelected);
+                      }}
                       className={`px-4 py-2 rounded-xl border ${
                         selectedCategory.includes(cat)
                           ? 'bg-brown-60 border-brown-60'

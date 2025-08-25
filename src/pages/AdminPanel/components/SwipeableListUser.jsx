@@ -10,12 +10,15 @@ import "react-swipeable-list/dist/styles.css";
 import Button from "../../../components/Button.jsx";
 import {Info} from "lucide-react";
 
-export default function SwipeableListUser({items}) {
+export default function SwipeableListUser({items, removeProduct}) {
 
-  const trailingActions = () => (
+  const trailingActions = (id) => (
     <TrailingActions>
-      <SwipeAction destructive={true} onClick={() => alert("Удалено")}>
-        <p className={" bg-red-600 flex justify-center items-center h-full  text-white"}>
+      <SwipeAction destructive={true}
+                   onClick={() => {
+                    removeProduct(id);
+      }}>
+        <p className={"px-2 cursor-pointer bg-red-600 flex justify-center items-center h-full  text-white"}>
           Удалить
         </p>
       </SwipeAction>
@@ -23,9 +26,9 @@ export default function SwipeableListUser({items}) {
   );
 
   return (
-    <SwipeableList type={ListType.IOS} >
+    <SwipeableList type={ListType.IOS} fullSwipe={true}>
       {items.map((item, index) => (
-        <SwipeableListItem key={index} trailingActions={trailingActions()} >
+        <SwipeableListItem key={index} trailingActions={trailingActions(item._id)} >
           <div className="w-full px-6 py-4 whitespace-nowrap border-dark-25 border-b-2 flex items-center justify-between">
             <div className="ml-1 flex gap-2 items-center">
 
@@ -53,10 +56,6 @@ export default function SwipeableListUser({items}) {
             <Button
               isTransparent={false}
               CustomIcon={Info}
-              // onClick={() => {
-              //   setInfoModalData(item);
-              //   setIsInfoModalOpened(true);
-              // }}
               className="!bg-transparent !text-sky-600 scale-140"
             />
           </div>

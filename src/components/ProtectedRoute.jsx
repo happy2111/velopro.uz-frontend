@@ -14,7 +14,7 @@ const ProtectedRoute = ({
   // Показываем загрузку пока проверяется авторизация
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
+      <div className="min-h-screen w-full bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brown-60 mx-auto mb-4"></div>
           <p className="text-xl">Загрузка Страницы...</p>
@@ -27,7 +27,10 @@ const ProtectedRoute = ({
   if (requireAuth) {
     // Пользователь не авторизован
     if (!isAuthenticated) {
-      return <Navigate to="/login" state={{ from: location }} replace />;
+      return <Navigate to={`/login?redirect=${location.pathname}`} state={{ from: location }} replace />;
+    }
+    if (requireRole && user?.role !== requireRole) {
+      return <Navigate to={redirectTo || "/unauthorized"} replace />;
     }
 
     // Проверяем роль, если она требуется
@@ -43,7 +46,8 @@ const ProtectedRoute = ({
   } else {
     // Роут для неавторизованных (например, login/register)
     if (isAuthenticated) {
-      return <Navigate to="/" replace />;
+      return <Navigate to={`/login?redirect=${location.pathname}`} state={{ from: location }} replace />;
+
     }
   }
 

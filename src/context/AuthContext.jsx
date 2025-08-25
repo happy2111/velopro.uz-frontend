@@ -165,7 +165,12 @@ export const AuthProvider = ({ children }) => {
 
   if (loading) {
     // Можете показать спиннер загрузки
-    return <div>Загрузка...</div>;
+    return (<div className="min-h-screen bg-[#0d0d0d] text-[#f5f5f5] flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brown-60 mx-auto mb-4"></div>
+        <p className="text-xl">Загрузка...</p>
+      </div>
+    </div>);
   }
 
   return (

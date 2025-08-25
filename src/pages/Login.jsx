@@ -16,6 +16,8 @@ const Login = () => {
   const location = useLocation();
 
   const from = location.state?.from?.pathname || '/';
+  const params = new URLSearchParams(location.search);
+  const redirect = params.get("redirect") || "/";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,13 +36,6 @@ const Login = () => {
 
   const validateForm = () => {
     const newErrors = {};
-
-    // if (!formData.email.trim()) {
-    //   newErrors.email = 'Email обязателен';
-    // } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-    //   newErrors.email = 'Некорректный email';
-    // }
-
     if (!formData.password) {
       newErrors.password = 'Пароль обязателен';
     }
@@ -63,7 +58,7 @@ const Login = () => {
       const result = await login(formData.login, formData.password);
 
       if (result.success) {
-        navigate(from, { replace: true });
+        navigate(redirect, { replace: true });
       } else {
         setErrors({ submit: result.error });
       }

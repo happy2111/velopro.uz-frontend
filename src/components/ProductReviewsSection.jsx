@@ -284,7 +284,7 @@ const ProductReviewsSection = ({ productId, currentUser }) => {
                 <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-6">
                   <div>
                     <div className="text-4xl lg:text-5xl font-bold text-white">
-                      {reviewStats.averageRating.toFixed(1)}
+                      {reviewStats?.averageRating.toFixed(1)}
                     </div>
                     <StarRating rating={Math.round(reviewStats.averageRating)} size="lg" />
                     <div className="text-sm text-gray-400 mt-2">
@@ -476,7 +476,7 @@ const ProductReviewsSection = ({ productId, currentUser }) => {
                 </div>
 
                 {/* Actions for review owner */}
-                {currentUser && review.user.email === currentUser.email && (
+                {currentUser && review?.user?.email === currentUser.email && (
                   <div className="flex space-x-2">
                     <button
                       onClick={() => startEditing(review)}

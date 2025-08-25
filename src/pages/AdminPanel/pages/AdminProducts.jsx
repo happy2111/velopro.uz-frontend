@@ -15,6 +15,10 @@ import InfoModal from "../components/InfoModal.jsx";
 import {useAdminData} from "../../../context/AdminDataContext.jsx";
 import {SwipeableList} from "react-swipeable-list";
 import SwipeableListUser from "../components/SwipeableListUser.jsx";
+import toast from "react-hot-toast";
+import ConfirmModal from "../../../components/ConfirmModal.jsx";
+import {useNavigate} from "react-router-dom";
+
 
 
 const AdminProducts = React.memo(({}) => {
@@ -33,6 +37,7 @@ const AdminProducts = React.memo(({}) => {
   const [isInfoModalOpened, setIsInfoModalOpened] = useState(false)
   const limit = 10; // Кол-во товаров на страницу
   const [infoModalData, setInfoModalData] = useState([])
+  const navigate = useNavigate()
 
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,15 +72,39 @@ const AdminProducts = React.memo(({}) => {
   };
 
 
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [modalPromise, setModalPromise] = useState(null);
+
+  const showConfirm = (text) => {
+    return new Promise((resolve) => {
+      setConfirmModal({isOpen: true, text});
+      setModalPromise(() => resolve);
+    });
+  };
+
+
   const removeProduct = async (productId) => {
     try {
-      const response = await axiosInstance.delete(`/api/products/${productId}`);
-      if (response.status === 200) {
-        setFilteredProducts((prevProducts) => prevProducts.filter(product => product._id !== productId));
-        fetchProducts()
-      } else {
-        console.error("Failed to delete product:", response.data);
+      const confirmed = await showConfirm("Are you sure you want to delete?");
+      if (confirmed) {
+        const response = await axiosInstance.delete(`/api/products/${productId}`);
+        if (response.status === 200) {
+          toast.success('User deleted successful', {
+            style: {
+              borderRadius: '8px',
+              background: 'var(--color-dark-12)',
+              color: 'var(--color-gray-95)',
+            },
+          });
+          setFilteredProducts((prevProducts) => prevProducts.filter(product => product._id !== productId));
+
+        } else {
+          console.error("Failed to delete product:", response.data);
+        }
       }
+      fetchProducts()
+
+
     } catch (err) {
       console.error("Error deleting product:", err);
       alert("Failed to delete product. Please try again.");
@@ -177,7 +206,10 @@ const AdminProducts = React.memo(({}) => {
                     </tr>
                   </thead>
                   {window.innerWidth < 768 ? (
-                      <SwipeableListUser items={filteredProducts} />
+                    <SwipeableListUser
+                      items={filteredProducts}
+                      removeProduct={removeProduct}
+                    />
                   ) : (
                     <tbody className="bg-dark-10  divide-y divide-dark-25">
                       {filteredProducts.map((user) => (
@@ -241,9 +273,7 @@ const AdminProducts = React.memo(({}) => {
                                   isTransparent={false}
                                   CustomIcon={Trash2}
                                   onClick={() => {
-                                    if (window.confirm(`Are you sure you want to delete product with ID: ${user._id}?`)) {
-                                      removeProduct(user._id);
-                                    }
+                                    removeProduct(user._id);
                                   }}
                                   className="!bg-transparent !text-red-600 scale-140"
                                 />
@@ -253,7 +283,9 @@ const AdminProducts = React.memo(({}) => {
                                   onClick={() => {
                                     setInfoModalData(user);
                                     setIsInfoModalOpened(true);
+                                    navigate(`/admin/product/${user._id}`)
                                   }}
+
                                   className="!bg-transparent !text-sky-600 scale-140 "
                                 />
                               </div>
@@ -307,6 +339,19 @@ const AdminProducts = React.memo(({}) => {
           editableFields={['title', 'price', 'category', 'description']}
         />)
       }
+
+      {<ConfirmModal
+        isOpen={!!confirmModal.isOpen}
+        text={confirmModal.text}
+        onConfirm={() => {
+          modalPromise(true);
+          setConfirmModal(false);
+        }}
+        onCancel={() => {
+          modalPromise(false);
+          setConfirmModal(false);
+        }}
+      />}
 
     </div>
   );
