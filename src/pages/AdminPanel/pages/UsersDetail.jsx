@@ -227,14 +227,14 @@ const UsersDetail = ({refreshData}) => {
                         key={index}
                         className="grid grid-cols-4 gap-4 text-sm py-3 border-b border-gray-800 last:border-b-0"
                       >
-                        <div className="font-medium text-sm">{order._id}</div>
-                        <div style={{color: '#81807E'}}>{formatDate(order.createdAt)}</div>
+                        <div className="font-medium text-sm">{order?._id}</div>
+                        <div style={{color: '#81807E'}}>{formatDate(order?.createdAt)}</div>
                         <div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                          {getStatusText(order.status)}
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order?.status)}`}>
+                          {getStatusText(order?.status)}
                         </span>
                         </div>
-                        <div className="font-medium">${order.total.toFixed(2)}</div>
+                        <div className="font-medium">${order?.total.toFixed(2)}</div>
                       </div>
                     ))
                   )}
@@ -263,7 +263,7 @@ const UsersDetail = ({refreshData}) => {
               </div>
 
               <div className="space-y-4">
-                {orders.map((product, index) => (
+                {orders?.map((product, index) => (
                   <div
                     key={index}
                     className=""
@@ -279,9 +279,9 @@ const UsersDetail = ({refreshData}) => {
                       >Address {index + 1}</span>
                     </div>
                     <p className="text-sm">
-                      {product.shippingAddress?.address}
-                      {product.shippingAddress?.city}
-                      {product.shippingAddress?.postalCode}
+                      {product?.shippingAddress?.address}
+                      {product?.shippingAddress?.city}
+                      {product?.shippingAddress?.postalCode}
                     </p>
                   </div>
                 ))}
