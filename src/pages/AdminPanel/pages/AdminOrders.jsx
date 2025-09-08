@@ -167,7 +167,7 @@ const AdminOrders = React.memo(({}) => {
                               <div className="text-sm font-medium text-gray-95">{
                                 user.products.map(product => (
                                   <div key={product._id} className="mb-1">
-                                    {product.product.title} (x{product.quantity})
+                                    {product?.product?.title} (x{product?.quantity})
                                   </div>
                                 ))
                               }
