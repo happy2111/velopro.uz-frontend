@@ -219,10 +219,10 @@ const UsersDetail = ({refreshData}) => {
                     <div>Order Status</div>
                     <div>Price</div>
                   </div>
-                  {orders.length === 0 ? (
+                  {orders?.length === 0 ? (
                     <p className="text-sm text-gray-400">No orders yet</p>
                   ) : (
-                    orders.map((order, index) => (
+                    orders?.map((order, index) => (
                       <div
                         key={index}
                         className="grid grid-cols-4 gap-4 text-sm py-3 border-b border-gray-800 last:border-b-0"
